@@ -1,0 +1,186 @@
+"use client";
+
+import Link from "next/link";
+import { useMemo, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
+
+export default function RegisterPage() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const hasMinLength = password.length >= 7;
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasLowercase = /[a-z]/.test(password);
+  const hasNumber = /\d/.test(password);
+  const hasSpecialChar = /[^A-Za-z0-9]/.test(password);
+  const isPasswordStrong =
+    hasMinLength && hasUppercase && hasLowercase && hasNumber && hasSpecialChar;
+
+  const passwordsMatch = useMemo(() => {
+    if (!confirmPassword) {
+      return true;
+    }
+    return password === confirmPassword;
+  }, [password, confirmPassword]);
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!passwordsMatch || !isPasswordStrong) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    // Placeholder for API integration.
+    setTimeout(() => {
+      setIsSubmitting(false);
+    }, 900);
+  }
+
+  return (
+    <main className="min-h-screen bg-zinc-50 px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-md">
+        <div className="mb-6 text-center">
+          <Link href="/" className="text-xl font-semibold tracking-tight text-zinc-900">
+            Vitthal
+          </Link>
+          <h1 className="mt-4 text-2xl font-semibold text-zinc-900">Create your account</h1>
+          <p className="mt-2 text-sm text-zinc-600">
+            Join as a buyer and source industrial products from trusted vendors.
+          </p>
+        </div>
+
+        <section className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm sm:p-7">
+          <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+            <div>
+              <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-zinc-800">
+                Full name
+              </label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                required
+                minLength={2}
+                autoComplete="name"
+                placeholder="Your full name"
+                className="h-11 w-full rounded-md border border-zinc-300 px-3 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-[#1d4ed8] focus:ring-1 focus:ring-[#1d4ed8]/30"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-zinc-800">
+                Email address
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                autoComplete="email"
+                placeholder="you@company.com"
+                className="h-11 w-full rounded-md border border-zinc-300 px-3 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-[#1d4ed8] focus:ring-1 focus:ring-[#1d4ed8]/30"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-zinc-800">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  minLength={7}
+                  autoComplete="new-password"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  placeholder="Create a strong password"
+                  aria-invalid={!isPasswordStrong && password.length > 0}
+                  className="h-11 w-full rounded-md border border-zinc-300 px-3 pr-10 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-[#1d4ed8] focus:ring-1 focus:ring-[#1d4ed8]/30"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-zinc-500 hover:text-zinc-700"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              <div className="mt-2 space-y-1 text-xs">
+                <p className={hasMinLength ? "text-emerald-600" : "text-zinc-500"}>
+                  At least 7 characters
+                </p>
+                <p className={hasUppercase ? "text-emerald-600" : "text-zinc-500"}>
+                  Contains an uppercase letter
+                </p>
+                <p className={hasLowercase ? "text-emerald-600" : "text-zinc-500"}>
+                  Contains a lowercase letter
+                </p>
+                <p className={hasNumber ? "text-emerald-600" : "text-zinc-500"}>
+                  Contains at least 1 number
+                </p>
+                <p className={hasSpecialChar ? "text-emerald-600" : "text-zinc-500"}>
+                  Contains at least 1 special character
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="confirmPassword" className="mb-1.5 block text-sm font-medium text-zinc-800">
+                Confirm password
+              </label>
+              <div className="relative">
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  required
+                  minLength={7}
+                  autoComplete="new-password"
+                  value={confirmPassword}
+                  onChange={(event) => setConfirmPassword(event.target.value)}
+                  placeholder="Re-enter your password"
+                  aria-invalid={!passwordsMatch}
+                  className="h-11 w-full rounded-md border border-zinc-300 px-3 pr-10 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-[#1d4ed8] focus:ring-1 focus:ring-[#1d4ed8]/30"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword((prev) => !prev)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-zinc-500 hover:text-zinc-700"
+                  aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                >
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              {!passwordsMatch ? (
+                <p className="mt-1.5 text-xs text-red-600">Passwords do not match.</p>
+              ) : null}
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmitting || !passwordsMatch || !isPasswordStrong}
+              className="h-11 w-full rounded-md bg-[#1d4ed8] px-4 text-sm font-medium text-white transition-colors hover:bg-[#1e40af] disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {isSubmitting ? "Creating account..." : "Create account"}
+            </button>
+          </form>
+
+          <p className="mt-6 text-center text-sm text-zinc-600">
+            Already have an account?{" "}
+            <Link href="/Login" className="font-medium text-[#1d4ed8] hover:text-[#1e40af]">
+              Sign in
+            </Link>
+          </p>
+        </section>
+      </div>
+    </main>
+  );
+}

@@ -33,13 +33,13 @@ export function Header() {
               </a>
             </li>
             <li>
-              <a href="#" className="hover:text-zinc-900 transition-colors">
+              <a href="/login" className="hover:text-zinc-900 transition-colors">
                 Login
               </a>
             </li>
             <li>
               <a
-                href="#"
+                href="/register"
                 className="rounded-md border border-zinc-300 px-3 py-1.5 text-zinc-800 hover:bg-zinc-100 transition-colors"
               >
                 Signup
@@ -81,13 +81,13 @@ export function Header() {
               </a>
             </li>
             <li>
-              <a href="#" className="hover:text-zinc-900 transition-colors block py-2">
+              <a href="/Login" className="hover:text-zinc-900 transition-colors block py-2">
                 Login
               </a>
             </li>
             <li>
               <a
-                href="#"
+                href="/Register"
                 className="rounded-md border border-zinc-300 px-3 py-2 text-zinc-800 hover:bg-zinc-100 transition-colors inline-block w-full text-center"
               >
                 Signup
