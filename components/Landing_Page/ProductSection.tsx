@@ -20,6 +20,7 @@ interface ProductSectionProps {
   products: Product[];
   showViewAll?: boolean;
   showMore?: boolean;
+  viewAllHref?: string;
   bg?: "white" | "zinc";
 }
 
@@ -30,6 +31,7 @@ export function ProductSection({
   products,
   showViewAll = false,
   showMore = false,
+  viewAllHref,
   bg = "white",
 }: ProductSectionProps) {
   return (
@@ -43,7 +45,7 @@ export function ProductSection({
           subtitle={subtitle}
           action={
             showViewAll || showMore ? (
-              <a href="#" className="text-sm font-medium text-[#1d4ed8] hover:text-[#1e40af]">
+              <a href={viewAllHref || "#"} className="text-sm font-medium text-[#1d4ed8] hover:text-[#1e40af]">
                 {showMore ? "Show More" : "View All"}
               </a>
             ) : null

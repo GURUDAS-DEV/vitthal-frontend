@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 
 const FALLBACK_IMAGE = "/placeholder-product.png";
 
@@ -21,6 +22,7 @@ type ProductCardProps = {
   vendor: string;
   location: string;
   image: string;
+  id: string;
 };
 
 export function ProductCard(product: ProductCardProps) {
@@ -55,12 +57,12 @@ export function ProductCard(product: ProductCardProps) {
           <p className="mt-0.5 text-xs text-zinc-400">{product.location}</p>
         </div>
 
-        <button
-          type="button"
-          className="mt-4 w-full rounded-lg border border-[#1d4ed8] px-3 py-2 text-xs font-semibold text-[#1d4ed8] transition-colors hover:bg-[#1d4ed8] hover:text-white"
+        <Link
+          href={`/product/${product.id}`}
+          className="mt-4 w-full rounded-lg border border-[#1d4ed8] px-3 py-2 text-center text-xs font-semibold text-[#1d4ed8] transition-colors hover:bg-[#1d4ed8] hover:text-white"
         >
           View Details
-        </button>
+        </Link>
       </div>
     </article>
   );

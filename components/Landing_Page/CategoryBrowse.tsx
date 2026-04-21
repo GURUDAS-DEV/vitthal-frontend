@@ -69,7 +69,7 @@ export function CategoryBrowse() {
                   <span>{category.products}</span>
                 </div>
                 <a
-                  href={`/category/${category.slug}`}
+                  href={`/products/${category.slug}`}
                   className="inline-block mt-1 rounded-lg bg-[#1d4ed8] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#1e40af] transition-colors"
                 >
                   Explore {category.title}

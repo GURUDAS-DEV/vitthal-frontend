@@ -15,8 +15,8 @@ type Product = {
   moq: string;
   leadTime: string;
   vendor: string;
-  location: string;
   image: string;
+  id: string;
 };
 
 // Map backend response to the frontend Product shape
@@ -29,10 +29,11 @@ function mapBackendProduct(bp: any): Product {
     moq: bp.specifications?.grade ? `Grade: ${bp.specifications.grade}` : "Check for MOQ",
     leadTime: vendorsCount > 0 ? "Fast Turnaround" : "Contact for details",
     vendor: vendorsCount === 1 ? "1 Verified Supplier" : `${vendorsCount} Verified Suppliers`,
-    location: "Pan India", // Global delivery indicator since location isn't in base product
+    // location: "Pan India", // Global delivery indicator since location isn't in base product
     image:
       bp.primary_image ||
       "https://www.shutterstock.com/image-photo/neatly-stacked-light-green-gypsum-600nw-2690641841.jpg",
+    id: bp.product_id || bp.id || "unknown",
   };
 }
 
@@ -80,8 +81,9 @@ export default async function Home() {
           id="featured-products"
           title="Featured Products"
           subtitle="High-demand SKUs from consistently rated suppliers"
-          products={featuredProducts.length > 0 ? featuredProducts : []} // Can add fallback here if needed
+          products={featuredProducts.length > 0 ? featuredProducts : []}
           showMore
+          viewAllHref="/products"
           bg="white"
         />
 
@@ -90,6 +92,7 @@ export default async function Home() {
           subtitle="Resins and compounds for packaging, molding, and extrusion"
           products={plasticProducts.length > 0 ? plasticProducts : []}
           showViewAll
+          viewAllHref="/products/plastic"
           bg="zinc"
         />
 
@@ -98,6 +101,7 @@ export default async function Home() {
           subtitle="Industrial-grade metal inputs for fabrication and manufacturing"
           products={metalProducts.length > 0 ? metalProducts : []}
           showViewAll
+          viewAllHref="/products/metal"
           bg="white"
         />
 

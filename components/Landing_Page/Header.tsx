@@ -18,17 +18,17 @@ export function Header() {
         <a href="#" className="text-xl font-semibold tracking-tight text-zinc-900">
           Vitthal
         </a>
-        
+
         {/* Desktop Navigation */}
         <nav className="hidden md:block">
           <ul className="flex items-center gap-6 text-sm font-medium text-zinc-700">
             <li>
-              <a href="#categories" className="hover:text-zinc-900 transition-colors">
+              <a href="/#categories" className="hover:text-zinc-900 transition-colors">
                 Categories
               </a>
             </li>
             <li>
-              <a href="#featured-products" className="hover:text-zinc-900 transition-colors">
+              <a href="/products" className="hover:text-zinc-900 transition-colors">
                 Products
               </a>
             </li>
@@ -63,8 +63,8 @@ export function Header() {
         <nav className="border-t border-zinc-200 bg-white md:hidden">
           <ul className="flex flex-col px-4 py-4 space-y-3 text-sm font-medium text-zinc-700">
             <li>
-              <a 
-                href="#categories" 
+              <a
+                href="#categories"
                 className="hover:text-zinc-900 transition-colors block py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -72,8 +72,8 @@ export function Header() {
               </a>
             </li>
             <li>
-              <a 
-                href="#featured-products" 
+              <a
+                href="#featured-products"
                 className="hover:text-zinc-900 transition-colors block py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
