@@ -2,6 +2,7 @@ import { Header, Footer, ProductCard } from "@/components/Landing_Page";
 import { Pagination } from "@/components/Pagination";
 
 type Product = {
+  id: string;
   name: string;
   price: string;
   moq: string;
@@ -14,6 +15,7 @@ type Product = {
 function mapBackendProduct(bp: any): Product {
   const vendorsCount = Number(bp.seller_count || bp.vendor_count || 0);
   return {
+    id: bp.product_id || bp.id || "unknown",
     name: bp.product_name || "Unknown Product",
     price: "Multiple Quotes",
     moq: bp.specifications?.grade ? `Grade: ${bp.specifications.grade}` : "Check for MOQ",
@@ -31,7 +33,9 @@ interface FetchResult {
   totalCount: number;
 }
 
-const BASE_URL = "http://localhost:9000/api/products";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL
+  ? `${process.env.NEXT_PUBLIC_API_URL}/api/products`
+  : "http://localhost:9000/api/products";
 const PRODUCTS_PER_PAGE = 20;
 
 export const revalidate = 0;
@@ -52,7 +56,6 @@ async function fetchProductsByCategory(
       return { products: [], totalCount: 0 };
     }
     const json = await res.json();
-    console.log(`[Frontend fetch] url=${url}, totalCount=${json.totalCount}, dataLength=${json.data?.length}`);
     const products = json.data && Array.isArray(json.data) ? json.data.map(mapBackendProduct) : [];
     const totalCount = typeof json.totalCount === "number" ? json.totalCount : products.length;
     return { products, totalCount };
@@ -134,8 +137,8 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 
             {paginatedProducts.length > 0 ? (
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                {paginatedProducts.map((product, index) => (
-                  <ProductCard key={`${product.name}-${index}`} {...product} />
+                {paginatedProducts.map((product) => (
+                  <ProductCard key={product.id} {...product} />
                 ))}
               </div>
             ) : (

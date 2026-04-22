@@ -4,12 +4,13 @@ import { ProductCard } from "./ProductCard";
 import { SectionHeading } from "./SectionHeading";
 
 type Product = {
+  id: string;
   name: string;
   price: string;
   moq: string;
   leadTime: string;
   vendor: string;
-  location: string;
+  location?: string;
   image: string;
 };
 
@@ -34,6 +35,7 @@ export function ProductSection({
   viewAllHref,
   bg = "white",
 }: ProductSectionProps) {
+  console.log("[ProductSection] product ids:", products.map((product) => product.id));
   return (
     <section
       id={id}
@@ -53,7 +55,7 @@ export function ProductSection({
         />
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {products.map((product) => (
-            <ProductCard key={product.name} {...product} />
+            <ProductCard key={product.id} {...product} />
           ))}
         </div>
       </div>

@@ -44,8 +44,12 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
+const PRODUCTS_BASE_URL = process.env.NEXT_PUBLIC_API_URL
+  ? `${process.env.NEXT_PUBLIC_API_URL}/api/products`
+  : "http://localhost:9000/api/products";
+
 async function fetchProduct(id: string): Promise<ProductDetail | null> {
-  const url = `http://localhost:9000/api/products/getProductById/${id}`;
+  const url = `${PRODUCTS_BASE_URL}/getProductById/${id}`;
   try {
     const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) return null;

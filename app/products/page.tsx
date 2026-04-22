@@ -34,7 +34,9 @@ interface FetchResult {
   totalCount: number;
 }
 
-const BASE_URL = "http://localhost:9000/api/products";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL
+  ? `${process.env.NEXT_PUBLIC_API_URL}/api/products`
+  : "http://localhost:9000/api/products";
 const PRODUCTS_PER_PAGE = 20;
 
 export const revalidate = 0;
@@ -51,7 +53,6 @@ async function fetchPaginatedProducts(offset: number, limit: number): Promise<Fe
       return { products: [], totalCount: 0 };
     }
     const json = await res.json();
-    console.log(`[Frontend fetch] url=${url}, totalCount=${json.totalCount}, dataLength=${json.data?.length}`);
     const products = json.data && Array.isArray(json.data) ? json.data.map(mapBackendProduct) : [];
     const totalCount = typeof json.totalCount === "number" ? json.totalCount : products.length;
     return { products, totalCount };

@@ -20,7 +20,7 @@ type ProductCardProps = {
   moq: string;
   leadTime: string;
   vendor: string;
-  location: string;
+  location?: string;
   image: string;
   id: string;
 };
@@ -54,7 +54,7 @@ export function ProductCard(product: ProductCardProps) {
 
         <div className="mt-3 border-t border-zinc-100 pt-3">
           <p className="text-xs font-semibold text-zinc-700">{product.vendor}</p>
-          <p className="mt-0.5 text-xs text-zinc-400">{product.location}</p>
+          <p className="mt-0.5 text-xs text-zinc-400">{product.location || "Pan India"}</p>
         </div>
 
         <Link

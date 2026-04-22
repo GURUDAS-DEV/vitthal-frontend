@@ -15,6 +15,7 @@ type Product = {
   moq: string;
   leadTime: string;
   vendor: string;
+  location?: string;
   image: string;
   id: string;
 };
@@ -38,7 +39,7 @@ function mapBackendProduct(bp: any): Product {
 }
 
 // Fetch helper
-async function fetchProducts(url: string) {
+async function fetchProducts(url: string): Promise<Product[]> {
   try {
     const res = await fetch(url, {
       cache: "no-store", // Always fetch fresh data during development
@@ -59,7 +60,9 @@ async function fetchProducts(url: string) {
 }
 
 export default async function Home() {
-  const BASE_URL = "http://localhost:9000/api/products";
+  const BASE_URL = process.env.NEXT_PUBLIC_API_URL
+    ? `${process.env.NEXT_PUBLIC_API_URL}/api/products`
+    : "http://localhost:9000/api/products";
 
   // Fetch concurrently
   const [featuredProducts, plasticProducts, metalProducts] = await Promise.all([
@@ -67,6 +70,11 @@ export default async function Home() {
     fetchProducts(`${BASE_URL}/getProductsByCategory/plastic?offset=0&limit=4`),
     fetchProducts(`${BASE_URL}/getProductsByCategory/metal?offset=0&limit=4`),
   ]);
+  console.log("Fetched products:", {
+    featured: featuredProducts.length,
+    plastic: plasticProducts.length,
+    metal: metalProducts.length,
+  });
 
   return (
     <div className="min-h-screen bg-white text-zinc-900">
