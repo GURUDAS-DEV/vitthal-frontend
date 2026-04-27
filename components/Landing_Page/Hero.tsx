@@ -13,11 +13,11 @@ export function Hero() {
         <div>
           {/* Badge */}
           <span className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[#1d4ed8]">
-            <span className="h-1.5 w-1.5 font-extrabold rounded-full bg-[#1d4ed8]" />
+            <span className="h-1.5 w-1.5 font-body font-extrabold rounded-full bg-[#1d4ed8]" />
             B2B Industrial Marketplace
           </span>
 
-          <h1 className="mt-5 max-w-xl text-4xl font-bold leading-[1.2] tracking-tight text-zinc-900 sm:text-5xl lg:text-[3.25rem]">
+          <h1 className="mt-5 max-w-xl text-4xl font-bold leading-[1.2] tracking-tight text-zinc-900 sm:text-5xl lg:text-[3.25rem] font-heading">
             Source Industrial&nbsp;Products from <span className="text-[#1d4ed8]">Verified Vendors</span>
           </h1>
 

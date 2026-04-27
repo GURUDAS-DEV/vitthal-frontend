@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useLayoutEffect } from "react";
 import { Menu, X, ShoppingCart, User, LogOut, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -12,15 +12,15 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdown, setProfileDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { user, isAuthenticated, fetchUser, logout } = useAuthStore();
+  const { user, isAuthenticated, isLoading, fetchUser, logout } = useAuthStore();
   const totalItems = useCartStore((s) => s.totalItems());
   const router = useRouter();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     fetchUser();
   }, [fetchUser]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setProfileDropdown(false);
@@ -51,7 +51,7 @@ export function Header() {
         </a>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:block">
+        <nav className="hidden md:block font-body">
           <ul className="flex items-center gap-6 text-sm font-medium text-zinc-700">
             <li>
               <a href="/products" className="hover:text-zinc-900 transition-colors">
@@ -74,7 +74,17 @@ export function Header() {
               </a>
             </li>
 
-            {isAuthenticated ? (
+            {isLoading ? (
+              // Skeleton loaders for desktop auth buttons
+              <>
+                <li className="animate-pulse">
+                  <div className="h-5 w-16 bg-zinc-200 rounded"></div>
+                </li>
+                <li className="animate-pulse">
+                  <div className="h-8 w-20 bg-zinc-200 rounded"></div>
+                </li>
+              </>
+            ) : isAuthenticated ? (
               <>
                 <li>
                   <Link href="/cart" className="hover:text-zinc-900 transition-colors relative flex items-center gap-1">
@@ -188,7 +198,20 @@ export function Header() {
               </a>
             </li>
 
-            {isAuthenticated ? (
+            {isLoading ? (
+              // Mobile skeleton loaders
+              <>
+                <li className="animate-pulse py-2">
+                  <div className="h-5 w-20 bg-zinc-200 rounded"></div>
+                </li>
+                <li className="animate-pulse py-2">
+                  <div className="h-10 w-full bg-zinc-200 rounded border border-zinc-300"></div>
+                </li>
+                <li className="animate-pulse py-2">
+                  <div className="h-10 w-full bg-zinc-200 rounded border border-zinc-300"></div>
+                </li>
+              </>
+            ) : isAuthenticated ? (
               <>
                 <li>
                   <Link

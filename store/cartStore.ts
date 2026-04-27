@@ -1,5 +1,7 @@
 import { create } from "zustand";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000";
+
 export type CartItem = {
   productId: string;
   productName: string;
@@ -13,51 +15,136 @@ export type CartItem = {
 
 type CartState = {
   items: CartItem[];
-  addItem: (item: CartItem) => void;
-  removeItem: (productId: string, vendorId: string) => void;
-  updateQuantity: (productId: string, vendorId: string, quantity: number) => void;
-  clearCart: () => void;
+  isLoading: boolean;
+  error: string | null;
+  fetchCart: () => Promise<void>;
+  addItem: (item: CartItem) => Promise<boolean>;
+  removeItem: (productId: string, vendorId: string) => Promise<boolean>;
+  updateQuantity: (productId: string, vendorId: string, quantity: number) => Promise<boolean>;
+  clearCart: () => Promise<boolean>;
   totalItems: () => number;
   totalPrice: () => number;
 };
 
 export const useCartStore = create<CartState>((set, get) => ({
   items: [],
+  isLoading: true,
+  error: null,
 
-  addItem: (item) =>
-    set((state) => {
-      const existing = state.items.find(
-        (i) => i.productId === item.productId && i.vendorId === item.vendorId
-      );
-      if (existing) {
-        return {
-          items: state.items.map((i) =>
-            i.productId === item.productId && i.vendorId === item.vendorId
-              ? { ...i, quantity: i.quantity + item.quantity }
-              : i
-          ),
-        };
+  fetchCart: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const res = await fetch(`${API_BASE}/api/cart`, {
+        credentials: "include",
+      });
+      if (!res.ok) {
+        if (res.status === 401) {
+          set({ items: [], isLoading: false });
+          return;
+        }
+        throw new Error("Failed to fetch cart");
       }
-      return { items: [...state.items, item] };
-    }),
+      const data = await res.json();
+      // Transform backend data to frontend format
+      const items: CartItem[] = (data.data || []).map((row: any) => ({
+        productId: row.product_id,
+        productName: row.product_name || "Unknown Product",
+        image: row.image_url || "",
+        price: parseFloat(row.price_at_added) || 0,
+        moq: row.moq || 1,
+        quantity: row.quantity,
+        vendorId: row.vendor_id,
+        vendorName: row.company_name || "Unknown Vendor",
+      }));
+      set({ items, isLoading: false });
+    } catch (err) {
+      console.error("fetchCart error:", err);
+      set({ error: "Failed to load cart", isLoading: false });
+    }
+  },
 
-  removeItem: (productId, vendorId) =>
-    set((state) => ({
-      items: state.items.filter(
-        (i) => !(i.productId === productId && i.vendorId === vendorId)
-      ),
-    })),
+  addItem: async (item) => {
+    set({ isLoading: true, error: null });
+    try {
+      const res = await fetch(`${API_BASE}/api/cart`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          product_id: item.productId,
+          vendor_id: item.vendorId,
+          quantity: item.quantity,
+        }),
+      });
+      if (!res.ok) {
+        if (res.status === 401) throw new Error("Please login to add items");
+        throw new Error("Failed to add item");
+      }
+      // Refresh cart to get updated data
+      await get().fetchCart();
+      return true;
+    } catch (err) {
+      console.error("addItem error:", err);
+      set({ error: err instanceof Error ? err.message : "Failed to add item", isLoading: false });
+      return false;
+    }
+  },
 
-  updateQuantity: (productId, vendorId, quantity) =>
-    set((state) => ({
-      items: state.items.map((i) =>
-        i.productId === productId && i.vendorId === vendorId
-          ? { ...i, quantity: Math.max(i.moq, quantity) }
-          : i
-      ),
-    })),
+  removeItem: async (productId, vendorId) => {
+    set({ isLoading: true, error: null });
+    try {
+      const res = await fetch(`${API_BASE}/api/cart/item`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ product_id: productId, vendor_id: vendorId }),
+      });
+      if (!res.ok) throw new Error("Failed to remove item");
+      await get().fetchCart();
+      return true;
+    } catch (err) {
+      console.error("removeItem error:", err);
+      set({ error: "Failed to remove item", isLoading: false });
+      return false;
+    }
+  },
 
-  clearCart: () => set({ items: [] }),
+  updateQuantity: async (productId, vendorId, quantity) => {
+    if (quantity < 1) return false;
+    set({ isLoading: true, error: null });
+    try {
+      const res = await fetch(`${API_BASE}/api/cart/item`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ product_id: productId, vendor_id: vendorId, quantity }),
+      });
+      if (!res.ok) throw new Error("Failed to update quantity");
+      await get().fetchCart();
+      return true;
+    } catch (err) {
+      console.error("updateQuantity error:", err);
+      set({ error: "Failed to update quantity", isLoading: false });
+      return false;
+    }
+  },
+
+  clearCart: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const res = await fetch(`${API_BASE}/api/cart`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Failed to clear cart");
+      set({ items: [], isLoading: false });
+      return true;
+    } catch (err) {
+      console.error("clearCart error:", err);
+      set({ error: "Failed to clear cart", isLoading: false });
+      return false;
+    }
+  },
 
   totalItems: () => get().items.reduce((sum, i) => sum + i.quantity, 0),
 

@@ -20,7 +20,11 @@ const FALLBACK_IMAGE =
 export default function ProductImageGallery({ images, productName }: ProductImageGalleryProps) {
   const orderedImages = useMemo(() => {
     const safeImages = (images ?? []).filter((img) => Boolean(img?.image_url));
-    return [...safeImages].sort((a, b) => {
+    // Remove duplicates based on image_url
+    const uniqueImages = safeImages.filter((img, index, self) =>
+      index === self.findIndex((i) => i.image_url === img.image_url)
+    );
+    return [...uniqueImages].sort((a, b) => {
       if (a.is_primary && !b.is_primary) return -1;
       if (!a.is_primary && b.is_primary) return 1;
       return (a.display_order ?? 0) - (b.display_order ?? 0);
@@ -30,20 +34,22 @@ export default function ProductImageGallery({ images, productName }: ProductImag
   const [selectedImage, setSelectedImage] = useState<string>(orderedImages[0]?.image_url || FALLBACK_IMAGE);
 
   return (
-    <div className="lg:w-1/2 p-6 bg-zinc-50/50 border-r border-zinc-100 flex flex-col">
-      <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-white border border-zinc-200 shadow-sm">
+    <div className="w-full h-full flex flex-col">
+      {/* Main Image - Full width, larger display */}
+      <div className="relative flex-1 w-full min-h-[300px] sm:min-h-[400px] lg:min-h-[500px] rounded-xl overflow-hidden bg-white border border-zinc-200 shadow-sm">
         <Image
           src={selectedImage}
           alt={productName}
           fill
-          className="object-contain p-4 hover:scale-105 transition-transform duration-500"
-          sizes="(max-width: 1024px) 100vw, 50vw"
+          className="object-contain p-2 sm:p-4 hover:scale-105 transition-transform duration-500"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
           priority
         />
       </div>
 
+      {/* Thumbnails - Larger size */}
       {orderedImages.length > 1 && (
-        <div className="flex gap-3 mt-4 overflow-x-auto pb-2">
+        <div className="flex gap-3 mt-4 overflow-x-auto pb-2 px-1">
           {orderedImages.map((img, idx) => {
             const isActive = selectedImage === img.image_url;
             return (
@@ -51,8 +57,8 @@ export default function ProductImageGallery({ images, productName }: ProductImag
                 key={`${img.image_url}-${idx}`}
                 type="button"
                 onClick={() => setSelectedImage(img.image_url)}
-                className={`relative w-20 h-20 rounded-lg overflow-hidden shrink-0 cursor-pointer border transition-colors ${
-                  isActive ? "border-blue-600 ring-2 ring-blue-200" : "border-zinc-200 hover:border-blue-500"
+                className={`relative w-24 h-24 sm:w-28 sm:h-28 rounded-lg overflow-hidden shrink-0 cursor-pointer border-2 transition-all ${
+                  isActive ? "border-blue-600 ring-2 ring-blue-200 shadow-md" : "border-zinc-200 hover:border-blue-500 hover:shadow-sm"
                 }`}
                 aria-label={`View ${productName} image ${idx + 1}`}
               >

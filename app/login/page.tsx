@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store/authStore";
+import Image from "next/image";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -60,8 +61,13 @@ export default function LoginPage() {
     <main className="min-h-screen bg-zinc-50 px-4 py-12 sm:px-6 lg:px-8">
       <div className="mx-auto w-full max-w-md">
         <div className="mb-6 text-center">
-          <Link href="/" className="text-xl font-semibold tracking-tight text-zinc-900">
-            Vitthal
+          <Link href="/" className="text-xl font-semibold flex justify-center items-center tracking-tight text-zinc-900">
+            <Image
+              src={"/favicon.ico"}
+              height="104"
+              width="100"
+              alt="Vitthal Logo"
+            />
           </Link>
           <h1 className="mt-4 text-2xl font-semibold text-zinc-900">Sign in to your account</h1>
           <p className="mt-2 text-sm text-zinc-600">
@@ -138,7 +144,7 @@ export default function LoginPage() {
 
           <p className="mt-6 text-center text-sm text-zinc-600">
             New to Vitthal?{" "}
-            <Link href="/Register" className="font-medium text-[#1d4ed8] hover:text-[#1e40af]">
+            <Link href="/register" className="font-medium text-[#1d4ed8] hover:text-[#1e40af]">
               Create an account
             </Link>
           </p>
