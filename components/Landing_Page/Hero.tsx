@@ -79,7 +79,7 @@ export function Hero() {
               priority
             />
             {/* Subtle overlay label */}
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/40 to-transparent px-5 py-4">
+            <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/40 to-transparent px-5 py-4">
               <p className="text-xs font-medium text-white/90">
                 Warehouse & Logistics Operations
               </p>
