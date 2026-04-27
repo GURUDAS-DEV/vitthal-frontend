@@ -82,7 +82,6 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
   return (
     <div className="min-h-screen bg-white text-zinc-900">
-      <Header />
 
       <main>
         {/* Page Header */}
@@ -151,7 +150,6 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
         </section>
       </main>
 
-      <Footer />
     </div>
   );
 }

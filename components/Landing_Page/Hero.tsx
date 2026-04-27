@@ -21,7 +21,7 @@ export function Hero() {
             Source Industrial&nbsp;Products from <span className="text-[#1d4ed8]">Verified Vendors</span>
           </h1>
 
-          <p className="mt-5 max-w-lg text-base leading-relaxed text-zinc-600 sm:text-lg">
+          <p className="mt-5 max-w-lg text-base font-light leading-relaxed text-zinc-600 sm:text-lg">
             Compare pricing, MOQ, lead times, and delivery commitments in one place.
             Connect with trusted suppliers across India.
           </p>

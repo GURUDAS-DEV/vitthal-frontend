@@ -1,4 +1,4 @@
-import { Header, Footer, ProductCard } from "@/components/Landing_Page";
+import { ProductCard } from "@/components/Landing_Page";
 import { Pagination } from "@/components/Pagination";
 
 type Product = {
@@ -89,7 +89,6 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 
   return (
     <div className="min-h-screen bg-white text-zinc-900">
-      <Header />
 
       <main>
         {/* Page Header */}
@@ -164,7 +163,6 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
         </section>
       </main>
 
-      <Footer />
     </div>
   );
 }

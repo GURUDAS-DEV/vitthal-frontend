@@ -1,10 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { toast } from "sonner";
+import { useAuthStore } from "@/store/authStore";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,10 +38,35 @@ export default function RegisterPage() {
 
     setIsSubmitting(true);
 
-    // Placeholder for API integration.
-    setTimeout(() => {
+    const formData = new FormData(event.currentTarget);
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const passwordValue = formData.get("password") as string;
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ name, email, password: passwordValue, role: "client" }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        toast.success(data.message || "Registration successful");
+        if (data.user) {
+          useAuthStore.getState().setUser(data.user);
+        }
+        router.push("/");
+      } else {
+        toast.error(data.message || "Registration failed");
+      }
+    } catch {
+      toast.error("Something went wrong. Please try again.");
+    } finally {
       setIsSubmitting(false);
-    }, 900);
+    }
   }
 
   return (

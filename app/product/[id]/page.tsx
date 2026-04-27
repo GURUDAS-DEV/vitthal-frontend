@@ -68,7 +68,6 @@ export default async function ProductDetailPage({ params }: PageProps) {
   if (!product) {
     return (
       <div className="min-h-screen bg-white text-zinc-900 flex flex-col">
-        <Header />
         <main className="flex-1 flex flex-col items-center justify-center p-8">
           <h1 className="text-3xl font-bold mb-4">Product Not Found</h1>
           <p className="text-zinc-500 mb-8">
@@ -81,14 +80,12 @@ export default async function ProductDetailPage({ params }: PageProps) {
             Back to Products
           </Link>
         </main>
-        <Footer />
-      </div>
+        </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-zinc-50 text-zinc-900 flex flex-col">
-      <Header />
 
       <main className="flex-1">
         {/* Breadcrumbs */}
@@ -237,7 +234,6 @@ export default async function ProductDetailPage({ params }: PageProps) {
         </section>
       </main>
 
-      <Footer />
     </div>
   );
 }

@@ -1,10 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { toast } from "sonner";
+import { useAuthStore } from "@/store/authStore";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [password, setPassword] = useState("");
@@ -21,10 +25,35 @@ export default function LoginPage() {
 
     setIsSubmitting(true);
 
-    // Placeholder for API integration.
-    setTimeout(() => {
+    const formData = new FormData(event.currentTarget);
+    const email = formData.get("email") as string;
+    const passwordValue = formData.get("password") as string;
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email, password: passwordValue }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        toast.success(data.message || "Login successful");
+        if (data.user) {
+          useAuthStore.getState().setUser(data.user);
+        }
+        const redirect = new URLSearchParams(window.location.search).get("redirect") || "/";
+        router.push(redirect);
+      } else {
+        toast.error(data.message || "Login failed");
+      }
+    } catch {
+      toast.error("Something went wrong. Please try again.");
+    } finally {
       setIsSubmitting(false);
-    }, 900);
+    }
   }
 
   return (

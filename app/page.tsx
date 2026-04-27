@@ -1,12 +1,10 @@
 import {
-  Header,
   Hero,
   MarketStats,
   CategoryBrowse,
   ProductSection,
   WhyChooseUs,
   CTASection,
-  Footer,
 } from "@/components/Landing_Page";
 
 type Product = {
@@ -78,7 +76,6 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-white text-zinc-900">
-      <Header />
 
       <main>
         <Hero />
@@ -117,7 +114,6 @@ export default async function Home() {
         <CTASection />
       </main>
 
-      <Footer />
     </div>
   );
 }

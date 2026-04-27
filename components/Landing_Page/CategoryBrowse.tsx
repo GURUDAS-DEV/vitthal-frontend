@@ -19,7 +19,7 @@ const categories: Category[] = [
     suppliers: "1,140+ suppliers",
     products: "8,200+ products",
     image:
-      "https://supplyx.info/wp-content/uploads/2023/05/2305_warehousing_solutions_lager_adrian_sulyok_unsplash-scaled-2.jpg",
+      "/Landing/PlasticManufacturing.webp",
     alt: "Plastic raw materials or granules",
     slug: "plastic",
   },
@@ -29,7 +29,7 @@ const categories: Category[] = [
     suppliers: "920+ suppliers",
     products: "6,500+ products",
     image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRB3XeSc4meKV0p4lWvIovsh6Ve93ButHPaVA&s",
+      "/Landing/MetalManufacturing.jpg",
     alt: "Metal sheets or industrial metal materials",
     slug: "metal",
   },
