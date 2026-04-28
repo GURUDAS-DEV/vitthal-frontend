@@ -30,7 +30,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${outfit.variable} ${montserrat.variable} h-full antialiased`}
+      className={`${outfit.variable} ${montserrat.variable} scroll-smooth h-full antialiased`}
     >
       <body
         className={`${outfit.variable} ${montserrat.variable} min-h-full flex flex-col font-body`}

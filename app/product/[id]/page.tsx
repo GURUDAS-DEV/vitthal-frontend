@@ -74,7 +74,7 @@ export default function ProductDetailPage() {
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const addItem = useCartStore((s) => s.addItem);
   const fetchCart = useCartStore((s) => s.fetchCart);
-  const totalItems = useCartStore((s) => s.totalItems());
+  const totalItems = useCartStore((s) => s.items.length);
   const [addingVendorId, setAddingVendorId] = useState<string | null>(null);
 
   useEffect(() => {

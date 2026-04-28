@@ -17,7 +17,7 @@ type CartState = {
   items: CartItem[];
   isLoading: boolean;
   error: string | null;
-  fetchCart: () => Promise<void>;
+  fetchCart: (silent?: boolean) => Promise<void>;
   addItem: (item: CartItem) => Promise<boolean>;
   removeItem: (productId: string, vendorId: string) => Promise<boolean>;
   updateQuantity: (productId: string, vendorId: string, quantity: number) => Promise<boolean>;
@@ -31,8 +31,8 @@ export const useCartStore = create<CartState>((set, get) => ({
   isLoading: true,
   error: null,
 
-  fetchCart: async () => {
-    set({ isLoading: true, error: null });
+  fetchCart: async (silent = false) => {
+    if (!silent) set({ isLoading: true, error: null });
     try {
       const res = await fetch(`${API_BASE}/api/cart`, {
         credentials: "include",
@@ -64,7 +64,6 @@ export const useCartStore = create<CartState>((set, get) => ({
   },
 
   addItem: async (item) => {
-    set({ isLoading: true, error: null });
     try {
       const res = await fetch(`${API_BASE}/api/cart`, {
         method: "POST",
@@ -91,7 +90,6 @@ export const useCartStore = create<CartState>((set, get) => ({
   },
 
   removeItem: async (productId, vendorId) => {
-    set({ isLoading: true, error: null });
     try {
       const res = await fetch(`${API_BASE}/api/cart/item`, {
         method: "DELETE",
@@ -100,7 +98,7 @@ export const useCartStore = create<CartState>((set, get) => ({
         body: JSON.stringify({ product_id: productId, vendor_id: vendorId }),
       });
       if (!res.ok) throw new Error("Failed to remove item");
-      await get().fetchCart();
+      await get().fetchCart(true);
       return true;
     } catch (err) {
       console.error("removeItem error:", err);
@@ -111,7 +109,6 @@ export const useCartStore = create<CartState>((set, get) => ({
 
   updateQuantity: async (productId, vendorId, quantity) => {
     if (quantity < 1) return false;
-    set({ isLoading: true, error: null });
     try {
       const res = await fetch(`${API_BASE}/api/cart/item`, {
         method: "PATCH",
@@ -120,7 +117,7 @@ export const useCartStore = create<CartState>((set, get) => ({
         body: JSON.stringify({ product_id: productId, vendor_id: vendorId, quantity }),
       });
       if (!res.ok) throw new Error("Failed to update quantity");
-      await get().fetchCart();
+      await get().fetchCart(true);
       return true;
     } catch (err) {
       console.error("updateQuantity error:", err);
@@ -130,7 +127,6 @@ export const useCartStore = create<CartState>((set, get) => ({
   },
 
   clearCart: async () => {
-    set({ isLoading: true, error: null });
     try {
       const res = await fetch(`${API_BASE}/api/cart`, {
         method: "DELETE",

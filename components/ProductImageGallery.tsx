@@ -36,7 +36,7 @@ export default function ProductImageGallery({ images, productName }: ProductImag
   return (
     <div className="w-full h-full flex flex-col">
       {/* Main Image - Full width, larger display */}
-      <div className="relative flex-1 w-full min-h-[300px] sm:min-h-[400px] lg:min-h-[500px] rounded-xl overflow-hidden bg-white border border-zinc-200 shadow-sm">
+      <div className="relative flex-1 w-full min-h-75 sm:min-h-[400px] lg:min-h-[500px] rounded-xl overflow-hidden bg-white border border-zinc-200 shadow-sm">
         <Image
           src={selectedImage}
           alt={productName}

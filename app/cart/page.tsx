@@ -226,7 +226,7 @@ export default function CartPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <h3 className="text-sm font-semibold text-zinc-900 truncate">{item.productName}</h3>
+                        <Link href={`/product/${item.productId}`} className="text-sm font-semibold text-zinc-900 truncate hover:text-[#1d4ed8] transition-colors">{item.productName}</Link>
                         <p className="text-xs text-zinc-500 mt-0.5">Supplier: {item.vendorName}</p>
                       </div>
                       <button

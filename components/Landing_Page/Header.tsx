@@ -13,7 +13,7 @@ export function Header() {
   const [profileDropdown, setProfileDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { user, isAuthenticated, isLoading, fetchUser, logout } = useAuthStore();
-  const totalItems = useCartStore((s) => s.totalItems());
+  const totalItems = useCartStore((s) => s.items.length);
   const router = useRouter();
 
   useLayoutEffect(() => {
@@ -64,12 +64,12 @@ export function Header() {
               </a>
             </li>
             <li>
-              <a href="/#aboutUs" className="hover:text-zinc-900 transition-colors">
+              <a href="/aboutUs" className="hover:text-zinc-900 transition-colors">
                 About us
               </a>
             </li>
             <li>
-              <a href="/#contacts" className="hover:text-zinc-900 transition-colors">
+              <a href="/contacts" className="hover:text-zinc-900 transition-colors">
                 Contact us
               </a>
             </li>
@@ -175,14 +175,38 @@ export function Header() {
         </button>
       </div>
 
-      {/* Mobile Navigation */}
-      {mobileMenuOpen && (
-        <nav className="border-t border-zinc-200 bg-white md:hidden">
-          <ul className="flex flex-col px-4 py-4 space-y-3 text-sm font-medium text-zinc-700">
+      {/* Mobile Navigation - Slide from Right */}
+      {/* Backdrop */}
+      <div
+        className={`fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity duration-300 ${
+          mobileMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
+        onClick={() => setMobileMenuOpen(false)}
+      />
+      {/* Sidebar */}
+      <div
+        className={`fixed top-0 right-0 h-full w-72 bg-white z-50 md:hidden shadow-2xl transform transition-transform duration-300 ease-in-out ${
+          mobileMenuOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        {/* Sidebar Header */}
+        <div className="flex items-center justify-between px-4 py-4 border-b border-zinc-200">
+          <span className="text-lg font-semibold text-zinc-900">Menu</span>
+          <button
+            onClick={() => setMobileMenuOpen(false)}
+            className="p-2 text-zinc-700 hover:text-zinc-900 transition-colors"
+            aria-label="Close menu"
+          >
+            <X size={24} />
+          </button>
+        </div>
+        {/* Sidebar Content */}
+        <nav className="h-[calc(100%-73px)] overflow-y-auto">
+          <ul className="flex flex-col px-4 py-4 space-y-1 text-sm font-medium text-zinc-700">
             <li>
               <a
                 href="/products"
-                className="hover:text-zinc-900 transition-colors block py-2"
+                className="hover:text-zinc-900 hover:bg-zinc-50 transition-colors block py-3 px-3 rounded-lg"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Products
@@ -191,23 +215,42 @@ export function Header() {
             <li>
               <a
                 href="/#categories"
-                className="hover:text-zinc-900 transition-colors block py-2"
+                className="hover:text-zinc-900 hover:bg-zinc-50 transition-colors block py-3 px-3 rounded-lg"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Categories
               </a>
             </li>
+            <li>
+              <a
+                href="/aboutUs"
+                className="hover:text-zinc-900 hover:bg-zinc-50 transition-colors block py-3 px-3 rounded-lg"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                About Us
+              </a>
+            </li>
+            <li>
+              <a
+                href="/contacts"
+                className="hover:text-zinc-900 hover:bg-zinc-50 transition-colors block py-3 px-3 rounded-lg"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Contact Us
+              </a>
+            </li>
+
+            <li className="border-t border-zinc-200 mt-4 pt-4">
+              <p className="px-3 text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">Account</p>
+            </li>
 
             {isLoading ? (
               // Mobile skeleton loaders
               <>
-                <li className="animate-pulse py-2">
+                <li className="animate-pulse py-2 px-3">
                   <div className="h-5 w-20 bg-zinc-200 rounded"></div>
                 </li>
-                <li className="animate-pulse py-2">
-                  <div className="h-10 w-full bg-zinc-200 rounded border border-zinc-300"></div>
-                </li>
-                <li className="animate-pulse py-2">
+                <li className="animate-pulse py-2 px-3">
                   <div className="h-10 w-full bg-zinc-200 rounded border border-zinc-300"></div>
                 </li>
               </>
@@ -216,7 +259,7 @@ export function Header() {
                 <li>
                   <Link
                     href="/cart"
-                    className="hover:text-zinc-900 transition-colors flex items-center gap-2 py-2"
+                    className="hover:text-zinc-900 hover:bg-zinc-50 transition-colors flex items-center gap-3 py-3 px-3 rounded-lg"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <ShoppingCart size={18} /> Cart
@@ -230,7 +273,7 @@ export function Header() {
                 <li>
                   <Link
                     href="/profile"
-                    className="hover:text-zinc-900 transition-colors flex items-center gap-2 py-2"
+                    className="hover:text-zinc-900 hover:bg-zinc-50 transition-colors flex items-center gap-3 py-3 px-3 rounded-lg"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <User size={18} /> Profile
@@ -239,7 +282,7 @@ export function Header() {
                 <li>
                   <button
                     onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
-                    className="flex items-center gap-2 py-2 text-red-600 hover:text-red-700"
+                    className="flex w-full items-center gap-3 py-3 px-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
                   >
                     <LogOut size={18} /> Logout
                   </button>
@@ -248,14 +291,19 @@ export function Header() {
             ) : (
               <>
                 <li>
-                  <a href="/login" className="hover:text-zinc-900 transition-colors block py-2">
+                  <a
+                    href="/login"
+                    className="hover:text-zinc-900 hover:bg-zinc-50 transition-colors block py-3 px-3 rounded-lg"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
                     Login
                   </a>
                 </li>
                 <li>
                   <a
                     href="/register"
-                    className="rounded-md border border-zinc-300 px-3 py-2 text-zinc-800 hover:bg-zinc-100 transition-colors inline-block w-full text-center"
+                    className="rounded-lg bg-[#1d4ed8] px-3 py-3 text-white hover:bg-[#1e40af] transition-colors block text-center"
+                    onClick={() => setMobileMenuOpen(false)}
                   >
                     Signup
                   </a>
@@ -264,7 +312,7 @@ export function Header() {
             )}
           </ul>
         </nav>
-      )}
+      </div>
     </header>
   );
 }

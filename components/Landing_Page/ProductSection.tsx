@@ -6,11 +6,10 @@ import { SectionHeading } from "./SectionHeading";
 type Product = {
   id: string;
   name: string;
-  price: string;
-  moq: string;
-  leadTime: string;
-  vendor: string;
-  location?: string;
+  minPrice: number;
+  maxPrice: number;
+  moq: number;
+  sellerCount: number;
   image: string;
 };
 

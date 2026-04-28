@@ -9,11 +9,10 @@ import {
 
 type Product = {
   name: string;
-  price: string;
-  moq: string;
-  leadTime: string;
-  vendor: string;
-  location?: string;
+  minPrice: number;
+  maxPrice: number;
+  moq: number;
+  sellerCount: number;
   image: string;
   id: string;
 };
@@ -21,14 +20,16 @@ type Product = {
 // Map backend response to the frontend Product shape
 function mapBackendProduct(bp: any): Product {
   const vendorsCount = Number(bp.seller_count || bp.vendor_count || 0);
+  const minPrice = Number(bp.min_price) || 0;
+  const maxPrice = Number(bp.max_price) || 0;
+  const minMoq = Number(bp.min_moq) || 1;
 
   return {
     name: bp.product_name || "Unknown Product",
-    price: "Multiple Quotes", // The base product query doesn't include specific prices
-    moq: bp.specifications?.grade ? `Grade: ${bp.specifications.grade}` : "Check for MOQ",
-    leadTime: vendorsCount > 0 ? "Fast Turnaround" : "Contact for details",
-    vendor: vendorsCount === 1 ? "1 Verified Supplier" : `${vendorsCount} Verified Suppliers`,
-    // location: "Pan India", // Global delivery indicator since location isn't in base product
+    minPrice,
+    maxPrice,
+    moq: minMoq,
+    sellerCount: vendorsCount,
     image:
       bp.primary_image ||
       "https://www.shutterstock.com/image-photo/neatly-stacked-light-green-gypsum-600nw-2690641841.jpg",
