@@ -54,7 +54,7 @@ export const useCartStore = create<CartState>((set, get) => ({
         moq: row.moq || 1,
         quantity: row.quantity,
         vendorId: row.vendor_id,
-        vendorName: row.company_name || "Unknown Vendor",
+        vendorName: row.vendor_name || "Unknown Vendor",
       }));
       set({ items, isLoading: false });
     } catch (err) {

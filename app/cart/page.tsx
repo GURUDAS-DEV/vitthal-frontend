@@ -291,12 +291,12 @@ export default function CartPage() {
                 </div>
               </div>
 
-              <button
-                onClick={() => toast.info("Checkout coming soon!")}
-                className="mt-6 h-11 w-full rounded-md bg-[#1d4ed8] px-4 text-sm font-medium text-white transition-colors hover:bg-[#1e40af]"
+              <Link
+                href="/checkout"
+                className="mt-6 flex items-center justify-center h-11 w-full rounded-md bg-[#1d4ed8] px-4 text-sm font-medium text-white transition-colors hover:bg-[#1e40af]"
               >
-                Place Order
-              </button>
+                Proceed to Checkout
+              </Link>
 
               <Link
                 href="/products"

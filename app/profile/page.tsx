@@ -10,38 +10,41 @@ import {
   Building2,
   LogOut,
   ChevronRight,
-  ShoppingCart,
   Package,
   Edit2,
   Camera,
   X,
   Check,
-  Clock,
   MapPin,
   Heart,
-  Star,
-  Plus,
-  Trash2,
+  AlertCircle,
+  Loader2,
 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { toast } from "sonner";
 
 type Address = {
-  id: number;
   address: string;
   city: string;
   state: string;
   country: string;
   pincode: string;
-  is_default?: boolean;
+  latitude: number;
+  longitude: number;
 };
 
 type ClientDetails = {
-  user_id: number;
+  user_id: string;
   user_name: string;
   email: string;
   phone?: string;
-  addresses: Address[];
+  address?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  pincode?: string;
+  latitude?: number;
+  longitude?: number;
 };
 
 export default function ProfilePage() {
@@ -49,25 +52,27 @@ export default function ProfilePage() {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState("");
-  const [editEmail, setEditEmail] = useState("");
   const [editPhone, setEditPhone] = useState("");
-  const [editCompany, setEditCompany] = useState("");
   const [profileImage, setProfileImage] = useState<string | null>(null);
-  
+
   // Client details from backend
   const [clientDetails, setClientDetails] = useState<ClientDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  
-  // Address management
-  const [addresses, setAddresses] = useState<Address[]>([]);
-  const [isAddingAddress, setIsAddingAddress] = useState(false);
-  const [editingAddressId, setEditingAddressId] = useState<number | null>(null);
+
+  // Setup Prompt State
+  const [isSetupComplete, setIsSetupComplete] = useState(true);
+
+  // Address management (Single address for client)
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [addressForm, setAddressForm] = useState({
     address: "",
     city: "",
     state: "",
     country: "",
     pincode: "",
+    latitude: null as number | null,
+    longitude: null as number | null,
   });
 
   useEffect(() => {
@@ -78,17 +83,30 @@ export default function ProfilePage() {
   useLayoutEffect(() => {
     async function fetchClientDetails() {
       try {
-        
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/client/clientDetails`, {
-          credentials : "include"
+          credentials: "include",
         });
-        
+
         if (response.ok) {
           const data = await response.json();
-          const addrList = data.data?.addresses || [];
           setClientDetails(data.data);
-          setAddresses(addrList);
+
           if (data.data?.phone) setEditPhone(data.data.phone);
+
+          if (data.data?.address) {
+            setAddressForm({
+              address: data.data.address,
+              city: data.data.city,
+              state: data.data.state,
+              country: data.data.country,
+              pincode: data.data.pincode,
+              latitude: data.data.latitude || null,
+              longitude: data.data.longitude || null,
+            });
+          }
+        } else if (response.status === 404) {
+          // If client details not found, it means they haven't set up their profile
+          setIsSetupComplete(false);
         }
       } catch (error) {
         console.error("Failed to fetch client details:", error);
@@ -96,14 +114,13 @@ export default function ProfilePage() {
         setIsLoading(false);
       }
     }
-    
+
     fetchClientDetails();
   }, []);
 
   useEffect(() => {
     if (user) {
       setEditName(user.username);
-      setEditEmail(user.email);
     }
   }, [user]);
 
@@ -120,116 +137,124 @@ export default function ProfilePage() {
   function handleCancel() {
     setIsEditing(false);
     setEditName(user?.username || "");
-    setEditEmail(user?.email || "");
-    setEditPhone("");
-    setEditCompany("");
+    setEditPhone(clientDetails?.phone || "");
   }
 
   async function handleSave() {
-    setIsEditing(false);
-    toast.success("Profile updated successfully");
-  }
+    if (!isSetupComplete) {
+      toast.error("Please set up your profile first");
+      return;
+    }
 
-  function resetAddressForm() {
-    setAddressForm({
-      address: "",
-      city: "",
-      state: "",
-      country: "",
-      pincode: "",
-    });
-    setEditingAddressId(null);
-    setIsAddingAddress(false);
-  }
-
-  async function handleAddAddress() {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/client/addClientDetails`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          ...addressForm,
-          latitude: 0,
-          longitude: 0,
-        }),
-      });
+      let updated = false;
 
-      if (response.ok) {
-        toast.success("Address added successfully");
-        const data = await response.json();
-        setAddresses(prev => [...prev, data.address]);
-        resetAddressForm();
-      } else {
-        const error = await response.json();
-        toast.error(error.message || "Failed to add address");
+      if (editPhone !== clientDetails?.phone) {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/client/updateClientNumber`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ phone: editPhone }),
+        });
+
+        if (!response.ok) throw new Error("Failed to update phone number");
+
+        setClientDetails(prev => prev ? { ...prev, phone: editPhone } : null);
+        updated = true;
+      }
+
+      if (editName !== user?.username) {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/update-name`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ name: editName }),
+        });
+
+        if (!response.ok) throw new Error("Failed to update name");
+
+        await fetchUser();
+        setClientDetails(prev => prev ? { ...prev, user_name: editName } : null);
+        updated = true;
+      }
+
+      setIsEditing(false);
+      if (updated) {
+        toast.success("Profile updated successfully");
       }
     } catch (error) {
-      toast.error("Something went wrong");
+      toast.error("Error updating profile");
     }
   }
 
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error("Geolocation is not supported by your browser");
+      return;
+    }
+
+    setIsGettingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setAddressForm(prev => ({
+          ...prev,
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        }));
+        setIsGettingLocation(false);
+        toast.success("Location captured successfully!");
+      },
+      (error) => {
+        setIsGettingLocation(false);
+        toast.error("Failed to get location. Please enable location services.");
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  };
+
   async function handleUpdateAddress() {
-    if (!editingAddressId) return;
-    
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/client/updateClientAddress/${editingAddressId}`, {
+      if (!addressForm.address || !addressForm.city || !addressForm.state || !addressForm.country || !addressForm.pincode) {
+        toast.error("All address fields are required");
+        return;
+      }
+
+      if (addressForm.latitude === null || addressForm.longitude === null) {
+        toast.error("Please capture your location coordinates");
+        return;
+      }
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/client/updateClientAddress`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify({
-          ...addressForm,
-          latitude: 0,
-          longitude: 0,
-        }),
+        body: JSON.stringify(addressForm),
       });
 
       if (response.ok) {
         toast.success("Address updated successfully");
         const data = await response.json();
-        setAddresses(prev => prev.map(addr => 
-          addr.id === editingAddressId ? data.address : addr
-        ));
-        resetAddressForm();
+
+        setClientDetails(prev => prev ? {
+          ...prev,
+          address: data.address.address,
+          city: data.address.city,
+          state: data.address.state,
+          country: data.address.country,
+          pincode: data.address.pincode,
+          latitude: data.address.latitude,
+          longitude: data.address.longitude,
+        } : null);
+
+        setIsEditingAddress(false);
       } else {
         toast.error("Failed to update address");
       }
     } catch (error) {
       toast.error("Something went wrong");
     }
-  }
-
-  async function handleDeleteAddress(addressId: number) {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/client/deleteAddress/${addressId}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-
-      if (response.ok) {
-        toast.success("Address deleted successfully");
-        setAddresses(prev => prev.filter(addr => addr.id !== addressId));
-      } else {
-        toast.error("Failed to delete address");
-      }
-    } catch (error) {
-      toast.error("Something went wrong");
-    }
-  }
-
-  function startEditAddress(address: Address) {
-    setEditingAddressId(address.id);
-    setAddressForm({
-      address: address.address,
-      city: address.city,
-      state: address.state,
-      country: address.country,
-      pincode: address.pincode,
-    });
   }
 
   function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -243,6 +268,14 @@ export default function ProfilePage() {
     }
   }
 
+  if (isLoading) {
+    return (
+      <div className="flex-1 bg-zinc-50 flex items-center justify-center h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-[#1d4ed8]" />
+      </div>
+    );
+  }
+
   return (
     <main className="flex-1 bg-zinc-50">
       <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
@@ -252,6 +285,28 @@ export default function ProfilePage() {
           <span className="mx-2">/</span>
           <span className="text-zinc-800 font-medium">My Profile</span>
         </nav>
+
+        {!isSetupComplete && (
+          <div className="mb-8 rounded-xl border border-amber-200 bg-amber-50 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+            <div className="flex items-start gap-4">
+              <div className="p-3 bg-amber-100 rounded-full text-amber-600 mt-1 sm:mt-0">
+                <AlertCircle size={24} />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-zinc-900">Complete Your Profile</h3>
+                <p className="text-sm text-zinc-600 mt-1">
+                  You haven't set up your profile yet. Please set it up to add your phone number and delivery address.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => router.push("/profile/setup")}
+              className="whitespace-nowrap px-6 py-2.5 rounded-lg bg-amber-600 text-white font-medium hover:bg-amber-700 transition-colors shadow-sm"
+            >
+              Set Up Profile
+            </button>
+          </div>
+        )}
 
         {/* Orders & Saved Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
@@ -309,27 +364,28 @@ export default function ProfilePage() {
                   <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                 </label>
               </div>
-              
-              <div className="flex-1 text-center sm:text-left pb-1">
+
+              <div className="flex-1 text-center sm:text-left pb-5">
                 {isEditing ? (
                   <input
                     type="text"
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
-                    className="text-xl font-bold text-zinc-900 border-b-2 border-[#1d4ed8] focus:outline-none bg-transparent text-center sm:text-left w-full sm:w-auto"
+                    className="text-xl font-bold text-white border-b-2 border-white/50 focus:border-white focus:outline-none bg-transparent text-center sm:text-left w-full sm:w-auto placeholder-white/50"
                     placeholder="Your Name"
                   />
                 ) : (
-                  <h1 className="text-xl font-bold text-zinc-900">
+                  <h1 className="text-xl font-bold text-white">
                     {user?.username || "Guest User"}
                   </h1>
                 )}
                 <p className="text-sm text-zinc-500 mt-0.5">{user?.email || "—"}</p>
               </div>
-              
+
               <button
                 onClick={isEditing ? handleSave : handleEdit}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1d4ed8] text-white hover:bg-[#1e40af] transition-colors font-medium text-sm"
+                disabled={!isSetupComplete}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1d4ed8] text-white hover:bg-[#1e40af] transition-colors font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isEditing ? <Check size={16} /> : <Edit2 size={16} />}
                 {isEditing ? "Save Changes" : "Edit Profile"}
@@ -340,7 +396,7 @@ export default function ProfilePage() {
             <div className="mt-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-base font-semibold text-zinc-900">Account Details</h2>
-                {isEditing && (
+                {isEditing && isSetupComplete && (
                   <button
                     onClick={handleCancel}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-300 text-zinc-700 hover:bg-zinc-50 transition-colors text-sm"
@@ -351,6 +407,14 @@ export default function ProfilePage() {
                 )}
               </div>
 
+              {!isSetupComplete && (
+                <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 mb-4">
+                  <p className="text-sm text-amber-800">
+                    Please <Link href="/profile/setup" className="font-semibold underline hover:text-amber-900">set up your profile</Link> first to edit your account details.
+                  </p>
+                </div>
+              )}
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Full Name */}
                 <div className="rounded-lg border border-zinc-200 bg-zinc-50/50 p-4">
@@ -358,12 +422,13 @@ export default function ProfilePage() {
                     <User size={14} />
                     Full Name
                   </div>
-                  {isEditing ? (
+                  {isEditing && isSetupComplete ? (
                     <input
                       type="text"
                       value={editName}
                       onChange={(e) => setEditName(e.target.value)}
                       className="w-full text-sm font-medium text-zinc-900 border-b border-zinc-300 focus:outline-none focus:border-[#1d4ed8] bg-transparent py-1"
+                      placeholder="Your Name"
                     />
                   ) : (
                     <p className="text-sm font-medium text-zinc-900">{user?.username || "—"}</p>
@@ -376,25 +441,16 @@ export default function ProfilePage() {
                     <Mail size={14} />
                     Email Address
                   </div>
-                  {isEditing ? (
-                    <input
-                      type="email"
-                      value={editEmail}
-                      onChange={(e) => setEditEmail(e.target.value)}
-                      className="w-full text-sm font-medium text-zinc-900 border-b border-zinc-300 focus:outline-none focus:border-[#1d4ed8] bg-transparent py-1"
-                    />
-                  ) : (
-                    <p className="text-sm font-medium text-zinc-900">{user?.email || "—"}</p>
-                  )}
+                  <p className="text-sm font-medium text-zinc-900">{user?.email || "—"}</p>
                 </div>
 
                 {/* Phone */}
-                <div className="rounded-lg border border-zinc-200 bg-zinc-50/50 p-4">
+                <div className="rounded-lg border border-zinc-200 bg-zinc-50/50 p-4 sm:col-span-2">
                   <div className="flex items-center gap-2 text-xs text-zinc-500 mb-1.5">
                     <Phone size={14} />
                     Phone Number
                   </div>
-                  {isEditing ? (
+                  {isEditing && isSetupComplete ? (
                     <input
                       type="tel"
                       value={editPhone}
@@ -403,26 +459,7 @@ export default function ProfilePage() {
                       placeholder="Add phone number"
                     />
                   ) : (
-                    <p className="text-sm font-medium text-zinc-900">{clientDetails?.phone || editPhone || "—"}</p>
-                  )}
-                </div>
-
-                {/* Company */}
-                <div className="rounded-lg border border-zinc-200 bg-zinc-50/50 p-4">
-                  <div className="flex items-center gap-2 text-xs text-zinc-500 mb-1.5">
-                    <Building2 size={14} />
-                    Company Name
-                  </div>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={editCompany}
-                      onChange={(e) => setEditCompany(e.target.value)}
-                      className="w-full text-sm font-medium text-zinc-900 border-b border-zinc-300 focus:outline-none focus:border-[#1d4ed8] bg-transparent py-1"
-                      placeholder="Add company name"
-                    />
-                  ) : (
-                    <p className="text-sm font-medium text-zinc-900">{editCompany || "—"}</p>
+                    <p className="text-sm font-medium text-zinc-900">{clientDetails?.phone || "—"}</p>
                   )}
                 </div>
               </div>
@@ -431,27 +468,25 @@ export default function ProfilePage() {
             {/* Address Section */}
             <div className="mt-6 pt-6 border-t border-zinc-200">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-base font-semibold text-zinc-900">My Addresses ({addresses.length})</h2>
-                {!isAddingAddress && editingAddressId === null && (
+                <h2 className="text-base font-semibold text-zinc-900">Delivery Address</h2>
+                {isSetupComplete && !isEditingAddress && (
                   <button
-                    onClick={() => setIsAddingAddress(true)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1d4ed8] text-white hover:bg-[#1e40af] transition-colors text-sm"
+                    onClick={() => setIsEditingAddress(true)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-300 text-zinc-700 hover:bg-zinc-50 transition-colors text-sm"
                   >
-                    <Plus size={14} />
-                    Add Address
+                    <Edit2 size={14} />
+                    Edit Address
                   </button>
                 )}
               </div>
 
-              {/* Add/Edit Address Form */}
-              {(isAddingAddress || editingAddressId !== null) && (
-                <div className="rounded-lg border border-zinc-200 bg-zinc-50/50 p-4 space-y-3 mb-4">
+              {/* Edit Address Form */}
+              {isEditingAddress && isSetupComplete ? (
+                <div className="rounded-lg border border-zinc-200 bg-zinc-50/50 p-4 space-y-4 mb-4">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium text-zinc-900">
-                      {editingAddressId ? "Edit Address" : "Add New Address"}
-                    </h3>
+                    <h3 className="font-medium text-zinc-900">Update Address</h3>
                     <button
-                      onClick={resetAddressForm}
+                      onClick={() => setIsEditingAddress(false)}
                       className="p-1 rounded hover:bg-zinc-200 text-zinc-500"
                     >
                       <X size={16} />
@@ -511,88 +546,77 @@ export default function ProfilePage() {
                       />
                     </div>
                   </div>
+
+                  <div>
+                    <label className="text-xs text-zinc-500 mb-1 block">Location Coordinates</label>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={getCurrentLocation}
+                        disabled={isGettingLocation}
+                        className="flex-1 flex items-center justify-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
+                      >
+                        {isGettingLocation ? <Loader2 size={16} className="animate-spin" /> : <MapPin size={16} />}
+                        {addressForm.latitude ? "Update Location" : "Capture Location"}
+                      </button>
+                    </div>
+                    {addressForm.latitude && addressForm.longitude && (
+                      <p className="mt-2 text-xs text-green-600 font-medium">
+                        Coordinates: {addressForm.latitude.toFixed(6)}, {addressForm.longitude.toFixed(6)}
+                      </p>
+                    )}
+                  </div>
+
                   <div className="flex gap-2 pt-2">
                     <button
-                      onClick={editingAddressId ? handleUpdateAddress : handleAddAddress}
+                      onClick={handleUpdateAddress}
                       className="flex-1 py-2 rounded-lg bg-[#1d4ed8] text-white text-sm font-medium hover:bg-[#1e40af] transition-colors"
                     >
-                      {editingAddressId ? "Update Address" : "Save Address"}
+                      Save Address
                     </button>
                     <button
-                      onClick={resetAddressForm}
+                      onClick={() => setIsEditingAddress(false)}
                       className="px-4 py-2 rounded-lg border border-zinc-300 text-zinc-700 text-sm font-medium hover:bg-zinc-50 transition-colors"
                     >
                       Cancel
                     </button>
                   </div>
                 </div>
-              )}
-
-              {/* Address List */}
-              {addresses.length > 0 ? (
-                <div className="space-y-3">
-                  {addresses.map((addr) => (
-                    <div
-                      key={addr.id}
-                      className={`rounded-lg border p-4 ${addr.is_default ? 'border-blue-300 bg-blue-50/30' : 'border-zinc-200 bg-zinc-50/50'}`}
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-start gap-3">
-                          <div className={`p-2 rounded-lg ${addr.is_default ? 'bg-blue-100 text-blue-600' : 'bg-zinc-100 text-zinc-600'}`}>
-                            <MapPin size={18} />
-                          </div>
-                          <div>
-                            <p className="font-medium text-zinc-900">{addr.address}</p>
-                            <p className="text-sm text-zinc-600 mt-0.5">
-                              {addr.city}, {addr.state} - {addr.pincode}
-                            </p>
-                            <p className="text-sm text-zinc-500">{addr.country}</p>
-                            {addr.is_default && (
-                              <span className="inline-flex items-center gap-1 mt-2 text-xs font-medium text-blue-600">
-                                <Star size={12} fill="currentColor" />
-                                Default Address
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <button
-                            onClick={() => startEditAddress(addr)}
-                            className="p-2 rounded-lg hover:bg-zinc-100 text-zinc-500 hover:text-zinc-700 transition-colors"
-                            title="Edit address"
-                          >
-                            <Edit2 size={16} />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteAddress(addr.id)}
-                            className="p-2 rounded-lg hover:bg-red-50 text-zinc-500 hover:text-red-600 transition-colors"
-                            title="Delete address"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      </div>
+              ) : clientDetails?.address ? (
+                <div className="rounded-lg border border-blue-200 bg-blue-50/50 p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 rounded-lg bg-blue-100 text-blue-600">
+                      <MapPin size={18} />
                     </div>
-                  ))}
+                    <div>
+                      <p className="font-medium text-zinc-900">{clientDetails.address}</p>
+                      <p className="text-sm text-zinc-600 mt-0.5">
+                        {clientDetails.city}, {clientDetails.state} - {clientDetails.pincode}
+                      </p>
+                      <p className="text-sm text-zinc-500">{clientDetails.country}</p>
+                      {clientDetails.latitude && clientDetails.longitude && (
+                        <p className="text-xs text-zinc-400 mt-1">
+                          📍 {clientDetails.latitude}, {clientDetails.longitude}
+                        </p>
+                      )}
+                    </div>
+                  </div>
                 </div>
               ) : (
                 <div className="rounded-lg border border-dashed border-zinc-300 p-6 text-center">
                   <MapPin size={32} className="mx-auto text-zinc-300 mb-2" />
-                  <p className="text-sm text-zinc-500">No addresses saved yet</p>
-                  {!isAddingAddress && (
-                    <button
-                      onClick={() => setIsAddingAddress(true)}
-                      className="mt-2 text-[#1d4ed8] text-sm font-medium hover:underline"
-                    >
-                      Add your first address
-                    </button>
-                  )}
+                  <p className="text-sm text-zinc-500">No address saved yet</p>
+                  <button
+                    onClick={() => router.push("/profile/setup")}
+                    className="mt-2 text-[#1d4ed8] text-sm font-medium hover:underline"
+                  >
+                    Set up your profile to add address
+                  </button>
                 </div>
               )}
             </div>
           </div>
         </div>
-
 
         {/* Logout */}
         <button

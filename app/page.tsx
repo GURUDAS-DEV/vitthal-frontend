@@ -69,11 +69,6 @@ export default async function Home() {
     fetchProducts(`${BASE_URL}/getProductsByCategory/plastic?offset=0&limit=4`),
     fetchProducts(`${BASE_URL}/getProductsByCategory/metal?offset=0&limit=4`),
   ]);
-  console.log("Fetched products:", {
-    featured: featuredProducts.length,
-    plastic: plasticProducts.length,
-    metal: metalProducts.length,
-  });
 
   return (
     <div className="min-h-screen bg-white text-zinc-900">

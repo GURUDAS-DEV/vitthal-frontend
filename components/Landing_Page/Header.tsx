@@ -46,32 +46,32 @@ export function Header() {
         </div>
       </div>
       <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <a href="/" className="text-xl font-semibold tracking-tight text-zinc-900">
+        <Link href="/" className="text-xl font-semibold tracking-tight text-zinc-900">
           Vitthal
-        </a>
+        </Link>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:block font-body">
           <ul className="flex items-center gap-6 text-sm font-medium text-zinc-700">
             <li>
-              <a href="/products" className="hover:text-zinc-900 transition-colors">
+              <Link href="/products" className="hover:text-zinc-900 transition-colors">
                 Products
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="/#categories" className="hover:text-zinc-900 transition-colors">
+              <Link href="/#categories" className="hover:text-zinc-900 transition-colors">
                 Categories
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="/aboutUs" className="hover:text-zinc-900 transition-colors">
+              <Link href="/aboutUs" className="hover:text-zinc-900 transition-colors">
                 About us
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="/contacts" className="hover:text-zinc-900 transition-colors">
+              <Link href="/contacts" className="hover:text-zinc-900 transition-colors">
                 Contact us
-              </a>
+              </Link>
             </li>
 
             {isLoading ? (
@@ -148,17 +148,17 @@ export function Header() {
             ) : (
               <>
                 <li>
-                  <a href="/login" className="hover:text-zinc-900 transition-colors">
+                  <Link href="/login" className="hover:text-zinc-900 transition-colors">
                     Login
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
+                  <Link
                     href="/register"
                     className="rounded-md border border-zinc-300 px-3 py-1.5 text-zinc-800 hover:bg-zinc-100 transition-colors"
                   >
                     Signup
-                  </a>
+                  </Link>
                 </li>
               </>
             )}
@@ -178,16 +178,14 @@ export function Header() {
       {/* Mobile Navigation - Slide from Right */}
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity duration-300 ${
-          mobileMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
+        className={`fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity duration-300 ${mobileMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
         onClick={() => setMobileMenuOpen(false)}
       />
       {/* Sidebar */}
       <div
-        className={`fixed top-0 right-0 h-full w-72 bg-white z-50 md:hidden shadow-2xl transform transition-transform duration-300 ease-in-out ${
-          mobileMenuOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed top-0 right-0 h-full w-72 bg-white z-50 md:hidden shadow-2xl transform transition-transform duration-300 ease-in-out ${mobileMenuOpen ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         {/* Sidebar Header */}
         <div className="flex items-center justify-between px-4 py-4 border-b border-zinc-200">
@@ -204,40 +202,40 @@ export function Header() {
         <nav className="h-[calc(100%-73px)] overflow-y-auto">
           <ul className="flex flex-col px-4 py-4 space-y-1 text-sm font-medium text-zinc-700">
             <li>
-              <a
+              <Link
                 href="/products"
                 className="hover:text-zinc-900 hover:bg-zinc-50 transition-colors block py-3 px-3 rounded-lg"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Products
-              </a>
+              </Link>
             </li>
             <li>
-              <a
+              <Link
                 href="/#categories"
                 className="hover:text-zinc-900 hover:bg-zinc-50 transition-colors block py-3 px-3 rounded-lg"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Categories
-              </a>
+              </Link>
             </li>
             <li>
-              <a
+              <Link
                 href="/aboutUs"
                 className="hover:text-zinc-900 hover:bg-zinc-50 transition-colors block py-3 px-3 rounded-lg"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 About Us
-              </a>
+              </Link>
             </li>
             <li>
-              <a
+              <Link
                 href="/contacts"
                 className="hover:text-zinc-900 hover:bg-zinc-50 transition-colors block py-3 px-3 rounded-lg"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Contact Us
-              </a>
+              </Link>
             </li>
 
             <li className="border-t border-zinc-200 mt-4 pt-4">
@@ -291,22 +289,22 @@ export function Header() {
             ) : (
               <>
                 <li>
-                  <a
+                  <Link
                     href="/login"
                     className="hover:text-zinc-900 hover:bg-zinc-50 transition-colors block py-3 px-3 rounded-lg"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Login
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
+                  <Link
                     href="/register"
                     className="rounded-lg bg-[#1d4ed8] px-3 py-3 text-white hover:bg-[#1e40af] transition-colors block text-center"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Signup
-                  </a>
+                  </Link>
                 </li>
               </>
             )}
