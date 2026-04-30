@@ -17,25 +17,7 @@ export function ProductFilters({ hideCategory = false }: ProductFiltersProps) {
   const [category, setCategory] = useState(searchParams.get("category") || "");
   const [productType, setProductType] = useState(searchParams.get("productType") || "");
 
-  // Debounced Search Update
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      updateUrl(search, category, productType);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [search]);
-
-  const handleCategoryChange = (val: string) => {
-    setCategory(val);
-    updateUrl(search, val, productType);
-  };
-
-  const handleTypeChange = (val: string) => {
-    setProductType(val);
-    updateUrl(search, category, val);
-  };
-
-  const updateUrl = (s: string, c: string, p: string) => {
+  function updateUrl(s: string, c: string, p: string) {
     const params = new URLSearchParams(searchParams.toString());
     if (s) params.set("search", s);
     else params.delete("search");
@@ -53,6 +35,24 @@ export function ProductFilters({ hideCategory = false }: ProductFiltersProps) {
     params.set("page", "1");
 
     router.push(`${pathname}?${params.toString()}`);
+  }
+
+  // Debounced Search Update
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      updateUrl(search, category, productType);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [category, pathname, productType, router, search, searchParams]);
+
+  const handleCategoryChange = (val: string) => {
+    setCategory(val);
+    updateUrl(search, val, productType);
+  };
+
+  const handleTypeChange = (val: string) => {
+    setProductType(val);
+    updateUrl(search, category, val);
   };
 
   return (

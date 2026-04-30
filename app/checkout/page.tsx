@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { useCartStore } from "@/store/cartStore";
 import { toast } from "sonner";
-import { MapPin, CreditCard, Package, CheckCircle, ChevronLeft, Loader2, Plus, ShieldCheck, Edit2, X } from "lucide-react";
+import { MapPin, CreditCard, Package, CheckCircle, ChevronLeft, Loader2, ShieldCheck, Edit2, X } from "lucide-react";
 import Link from "next/link";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000";
@@ -58,13 +58,7 @@ export default function CheckoutPage() {
         }
     }, [isAuthenticated, authLoading, router]);
 
-    useEffect(() => {
-        if (isAuthenticated) {
-            loadClientDetails();
-        }
-    }, [isAuthenticated]);
-
-    const loadClientDetails = async () => {
+    async function loadClientDetails() {
         try {
             const res = await fetch(`${API_BASE}/api/client/clientDetails`, {
                 credentials: "include"
@@ -94,7 +88,17 @@ export default function CheckoutPage() {
         } finally {
             setFetchingClient(false);
         }
-    };
+    }
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            const timer = window.setTimeout(() => {
+                void loadClientDetails();
+            }, 0);
+
+            return () => window.clearTimeout(timer);
+        }
+    }, [isAuthenticated]);
 
     const getCurrentLocation = () => {
         if (!navigator.geolocation) {
@@ -112,7 +116,7 @@ export default function CheckoutPage() {
                 setIsGettingLocation(false);
                 toast.success("Location captured successfully!");
             },
-            (error) => {
+            () => {
                 setIsGettingLocation(false);
                 toast.error("Failed to get location. Please enable location services.");
             },

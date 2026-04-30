@@ -13,6 +13,17 @@ export type CartItem = {
   vendorName: string;
 };
 
+type CartApiRow = {
+  product_id: string;
+  product_name?: string | null;
+  image_url?: string | null;
+  price_at_added: string | number;
+  moq?: number | null;
+  quantity: number;
+  vendor_id: string;
+  vendor_name?: string | null;
+};
+
 type CartState = {
   items: CartItem[];
   isLoading: boolean;
@@ -46,11 +57,11 @@ export const useCartStore = create<CartState>((set, get) => ({
       }
       const data = await res.json();
       // Transform backend data to frontend format
-      const items: CartItem[] = (data.data || []).map((row: any) => ({
+      const items: CartItem[] = ((data.data as CartApiRow[] | undefined) || []).map((row) => ({
         productId: row.product_id,
         productName: row.product_name || "Unknown Product",
         image: row.image_url || "",
-        price: parseFloat(row.price_at_added) || 0,
+        price: Number(row.price_at_added) || 0,
         moq: row.moq || 1,
         quantity: row.quantity,
         vendorId: row.vendor_id,

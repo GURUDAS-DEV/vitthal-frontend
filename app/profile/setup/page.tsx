@@ -10,7 +10,7 @@ type SetupStep = "contact" | "address";
 
 export default function SetupProfile() {
   const router = useRouter();
-  const { user } = useAuthStore();
+  useAuthStore();
   const [step, setStep] = useState<SetupStep>("contact");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGettingLocation, setIsGettingLocation] = useState(false);
@@ -29,11 +29,7 @@ export default function SetupProfile() {
   const [latitude, setLatitude] = useState<number | null>(null);
   const [longitude, setLongitude] = useState<number | null>(null);
 
-  useEffect(() => {
-    checkSetupStatus();
-  }, []);
-
-  const checkSetupStatus = async () => {
+  async function checkSetupStatus() {
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/client/checkSetupStatus`,
@@ -51,7 +47,15 @@ export default function SetupProfile() {
     } finally {
       setIsCheckingSetup(false);
     }
-  };
+  }
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      void checkSetupStatus();
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, []);
 
   const getCurrentLocation = () => {
     if (!navigator.geolocation) {
