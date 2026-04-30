@@ -8,7 +8,7 @@ export function Footer() {
       <div className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-5 lg:gap-12">
           <div>
-            <h3 className="text-base font-semibold text-white">Vitthal</h3>
+            <h3 className="text-base font-semibold text-white">MTWO Groups</h3>
             <p className="mt-4 text-sm text-zinc-400 leading-relaxed">
               B2B industrial sourcing and procurement marketplace connecting manufacturers with verified suppliers.
             </p>
@@ -96,8 +96,8 @@ export function Footer() {
             <h4 className="text-sm font-semibold text-white">Get in Touch</h4>
             <ul className="mt-4 space-y-3 text-sm text-zinc-400">
               <li>
-                <a href="mailto:support@vitthal.com" className="hover:text-white transition-colors break-all">
-                  support@vitthal.com
+                <a href="mailto:support@mtwo.com" className="hover:text-white transition-colors break-all">
+                  support@mtwo.com
                 </a>
               </li>
               <li>
@@ -114,7 +114,7 @@ export function Footer() {
 
         <div className="mt-12 border-t border-zinc-800 pt-8">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <p className="text-sm text-zinc-500">&copy; {currentYear} Vitthal. All rights reserved.</p>
+            <p className="text-sm text-zinc-500">&copy; {currentYear} MTWO. All rights reserved.</p>
             <div className="flex gap-6 text-sm text-zinc-500">
               <a href="#" className="hover:text-white transition-colors">
                 Privacy Policy
