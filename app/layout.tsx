@@ -17,7 +17,7 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "Vitthal | B2B Industrial Marketplace",
+  title: "MTWO Groups | B2B Industrial Marketplace",
   description:
     "Source industrial products from verified vendors with transparent pricing, MOQ, and delivery timelines.",
 };

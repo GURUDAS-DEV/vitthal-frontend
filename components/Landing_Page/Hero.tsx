@@ -1,8 +1,24 @@
 "use client";
 
 import Image from "next/image";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export function Hero() {
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
+  const handleQuickSearch = (term: string) => {
+    router.push(`/products?search=${encodeURIComponent(term)}`);
+  };
+
   return (
     <section
       className="relative flex items-center bg-zinc-50"
@@ -27,10 +43,12 @@ export function Hero() {
           </p>
 
           {/* Search bar */}
-          <form className="mt-8 flex w-full flex-col gap-3 rounded-xl border border-zinc-200 bg-white p-2.5 shadow-sm sm:flex-row">
+          <form onSubmit={handleSearch} className="mt-8 flex w-full flex-col gap-3 rounded-xl border border-zinc-200 bg-white p-2.5 shadow-sm sm:flex-row">
             <input
               type="text"
               placeholder="Search for plastic granules, metal sheets..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="h-12 w-full rounded-lg border border-zinc-200 bg-white px-4 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-[#1d4ed8] focus:ring-2 focus:ring-[#1d4ed8]/20"
             />
             <button
@@ -49,7 +67,8 @@ export function Hero() {
                 <button
                   key={label}
                   type="button"
-                  className="rounded-full border border-zinc-300 bg-white px-3 py-1.5 transition-colors hover:border-[#1d4ed8] hover:text-[#1d4ed8]"
+                  onClick={() => handleQuickSearch(label)}
+                  className="rounded-full border border-zinc-300 bg-white px-3 py-1.5 transition-colors hover:border-[#1d4ed8] hover:text-[#1d4ed8] cursor-pointer"
                 >
                   {label}
                 </button>

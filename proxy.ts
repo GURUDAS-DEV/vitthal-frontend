@@ -6,9 +6,8 @@ const authRoutes = ["/login", "/register"];
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const accessToken = request.cookies.get("accessToken")?.value;
   const refreshToken = request.cookies.get("refreshToken")?.value;
-  const isAuthenticated = !!(accessToken || refreshToken);
+  const isAuthenticated = !!refreshToken;
 
   // Redirect unauthenticated users trying to access protected routes
   if (protectedRoutes.some((route) => pathname.startsWith(route))) {

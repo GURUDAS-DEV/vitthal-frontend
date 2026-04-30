@@ -180,7 +180,7 @@ export default function RegisterPage() {
               src={"/favicon.ico"}
               height="104"
               width="100"
-              alt="Vitthal Logo"
+              alt="MTWO Logo"
             />
           </Link>
           <h1 className="mt-4 text-2xl font-semibold text-zinc-900">
@@ -336,7 +336,7 @@ export default function RegisterPage() {
                     </span>
                   )}
                 </p>
-                <div className="flex gap-2">
+                <div className="flex flex-col gap-2 sm:flex-row">
                   <input
                     type="text"
                     inputMode="numeric"

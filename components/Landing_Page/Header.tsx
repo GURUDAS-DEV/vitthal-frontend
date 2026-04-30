@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { useCartStore } from "@/store/cartStore";
 import { toast } from "sonner";
+import Image from "next/image";
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -42,12 +43,18 @@ export function Header() {
       <div className="border-b border-zinc-100 bg-zinc-50/80">
         <div className="mx-auto flex h-9 w-full max-w-7xl items-center justify-between px-4 text-xs text-zinc-600 sm:px-6 lg:px-8">
           <p>Trusted by procurement teams in manufacturing and distribution</p>
-          <p className="hidden sm:block">support@vitthal.com</p>
+          <p className="hidden sm:block">support@mtwo.com</p>
         </div>
       </div>
-      <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="text-xl font-semibold tracking-tight text-zinc-900">
-          Vitthal
+      <div className="mx-auto flex  h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <Link href="/" className="text-xl flex h-full justify-center items-center gap-3 font-semibold tracking-tight text-zinc-900">
+          <Image
+            src="/logo.jpeg"
+            alt="MTWO Groups"
+            width={42}
+            height={42}
+          />
+          <h1 className="font-heading text-xl">MTWO Groups</h1>
         </Link>
 
         {/* Desktop Navigation */}

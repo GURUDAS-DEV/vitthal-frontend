@@ -40,7 +40,7 @@ export function WhyChooseUs() {
   return (
     <section className="bg-zinc-50 border-t border-zinc-200">
       <div className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <SectionHeading title="Why Choose Vitthal" subtitle="Built for enterprise procurement teams in manufacturing and distribution" />
+        <SectionHeading title="Why Choose MTWO Groups" subtitle="Built for enterprise procurement teams in manufacturing and distribution" />
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {trustPoints.map((point) => {
             const Icon = point.icon;

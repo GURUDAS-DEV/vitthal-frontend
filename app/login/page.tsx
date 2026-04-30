@@ -66,7 +66,7 @@ export default function LoginPage() {
               src={"/favicon.ico"}
               height="104"
               width="100"
-              alt="Vitthal Logo"
+              alt="MTWO Groups Logo"
             />
           </Link>
           <h1 className="mt-4 text-2xl font-semibold text-zinc-900">Sign in to your account</h1>
@@ -143,7 +143,7 @@ export default function LoginPage() {
           </form>
 
           <p className="mt-6 text-center text-sm text-zinc-600">
-            New to Vitthal?{" "}
+            New to MTWO Groups?{" "}
             <Link href="/register" className="font-medium text-[#1d4ed8] hover:text-[#1e40af]">
               Create an account
             </Link>

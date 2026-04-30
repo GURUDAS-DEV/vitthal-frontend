@@ -172,7 +172,7 @@ export default function ForgotPasswordPage() {
               src={"/favicon.ico"}
               height="104"
               width="100"
-              alt="Vitthal Logo"
+              alt=" Logo"
             />
           </Link>
           <h1 className="mt-4 text-2xl font-semibold text-zinc-900">
