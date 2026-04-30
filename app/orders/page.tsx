@@ -44,13 +44,7 @@ export default function OrdersPage() {
         }
     }, [isAuthenticated, authLoading, router]);
 
-    useEffect(() => {
-        if (isAuthenticated) {
-            fetchOrders();
-        }
-    }, [isAuthenticated]);
-
-    const fetchOrders = async () => {
+    async function fetchOrders() {
         try {
             const res = await fetch(`${API_BASE}/api/orders`, {
                 credentials: "include"
@@ -69,7 +63,17 @@ export default function OrdersPage() {
         } finally {
             setFetchingOrders(false);
         }
-    };
+    }
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            const timer = window.setTimeout(() => {
+                void fetchOrders();
+            }, 0);
+
+            return () => window.clearTimeout(timer);
+        }
+    }, [isAuthenticated]);
 
     const getStatusIcon = (status: string) => {
         switch (status.toLowerCase()) {
@@ -118,7 +122,7 @@ export default function OrdersPage() {
                         <Package className="mx-auto h-20 w-20 text-zinc-300 mb-6" />
                         <h2 className="text-2xl font-semibold text-zinc-900 mb-2">No orders yet</h2>
                         <p className="text-zinc-500 mb-8 max-w-md mx-auto">
-                            You haven't placed any orders. Browse our catalog to find the best industrial products for your needs.
+                            You haven&apos;t placed any orders. Browse our catalog to find the best industrial products for your needs.
                         </p>
                         <Link href="/products" className="inline-block bg-blue-600 text-white px-8 py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors shadow-sm">
                             Start Shopping
