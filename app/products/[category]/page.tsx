@@ -56,13 +56,13 @@ async function fetchProductsByCategory(
     const params = new URLSearchParams({
       offset: offset.toString(),
       limit: limit.toString(),
-      category: category, // hardcode category
     });
 
     if (search) params.append("search", search);
     if (productType) params.append("productType", productType);
 
-    const url = `${BASE_URL}/getAllProducts?${params.toString()}`;
+    // Use the dedicated category endpoint: /getProductsByCategory/:category
+    const url = `${BASE_URL}/getProductsByCategory/${encodeURIComponent(category)}?${params.toString()}`;
     const res = await fetch(url, {
       cache: "no-store",
     });

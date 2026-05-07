@@ -8,6 +8,15 @@ interface ProductFiltersProps {
   hideCategory?: boolean;
 }
 
+type Category = {
+  code: string;
+  label: string;
+};
+
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL
+  ? `${process.env.NEXT_PUBLIC_API_URL}/api/products`
+  : "http://localhost:9000/api/products";
+
 export function ProductFilters({ hideCategory = false }: ProductFiltersProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -16,18 +25,34 @@ export function ProductFilters({ hideCategory = false }: ProductFiltersProps) {
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [category, setCategory] = useState(searchParams.get("category") || "");
   const [productType, setProductType] = useState(searchParams.get("productType") || "");
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  // Fetch categories dynamically from the API
+  useEffect(() => {
+    if (hideCategory) return;
+    fetch(`${BASE_URL}/getCategories`)
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.data && Array.isArray(json.data)) {
+          setCategories(json.data as Category[]);
+        }
+      })
+      .catch(() => {
+        // fallback silently — dropdown will just show "All Categories"
+      });
+  }, [hideCategory]);
 
   function updateUrl(s: string, c: string, p: string) {
     const params = new URLSearchParams(searchParams.toString());
     if (s) params.set("search", s);
     else params.delete("search");
-    
+
     // If hideCategory is true, we shouldn't modify the category query param because it's managed by the URL path
     if (!hideCategory) {
       if (c) params.set("category", c);
       else params.delete("category");
     }
-    
+
     if (p) params.set("productType", p);
     else params.delete("productType");
 
@@ -76,8 +101,11 @@ export function ProductFilters({ hideCategory = false }: ProductFiltersProps) {
             className="border border-zinc-200 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-zinc-900 text-zinc-700 min-w-[140px] transition-colors text-sm"
           >
             <option value="">All Categories</option>
-            <option value="plastic">Plastic</option>
-            <option value="metal">Metal</option>
+            {categories.map((cat) => (
+              <option key={cat.code} value={cat.code}>
+                {cat.label}
+              </option>
+            ))}
           </select>
         )}
 
