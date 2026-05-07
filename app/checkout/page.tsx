@@ -61,7 +61,11 @@ export default function CheckoutPage() {
     async function loadClientDetails() {
         try {
             const res = await fetch(`${API_BASE}/api/client/clientDetails`, {
-                credentials: "include"
+                credentials: "include",
+                headers : {
+                    "Content-Type": "application/json",
+                    "x-request-from": "client"
+                }
             });
             if (res.ok) {
                 const data = await res.json();
@@ -138,7 +142,7 @@ export default function CheckoutPage() {
         try {
             const res = await fetch(`${API_BASE}/api/client/upsertAddress`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json", "x-request-from": "client" },
                 credentials: "include",
                 body: JSON.stringify(addressForm)
             });
@@ -168,7 +172,11 @@ export default function CheckoutPage() {
         try {
             const res = await fetch(`${API_BASE}/api/checkout/placeOrder`, {
                 method: "POST",
-                credentials: "include"
+                credentials: "include",
+                headers : {
+                    "Content-Type": "application/json",
+                    "x-request-from": "client"
+                }
             });
 
             if (res.ok) {

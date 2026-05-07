@@ -31,12 +31,22 @@ export default function LoginPage() {
     const passwordValue = formData.get("password") as string;
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ email, password: passwordValue }),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-request-from": "client",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            email,
+            password: passwordValue,
+            role: "client",
+          }),
+        },
+      );
 
       const data = await res.json();
 
@@ -45,7 +55,8 @@ export default function LoginPage() {
         if (data.user) {
           useAuthStore.getState().setUser(data.user);
         }
-        const redirect = new URLSearchParams(window.location.search).get("redirect") || "/";
+        const redirect =
+          new URLSearchParams(window.location.search).get("redirect") || "/";
         router.push(redirect);
       } else {
         toast.error(data.message || "Login failed");
@@ -61,7 +72,10 @@ export default function LoginPage() {
     <main className="min-h-screen bg-zinc-50 px-4 py-12 sm:px-6 lg:px-8">
       <div className="mx-auto w-full max-w-md">
         <div className="mb-6 text-center">
-          <Link href="/" className="text-xl font-semibold flex justify-center items-center tracking-tight text-zinc-900">
+          <Link
+            href="/"
+            className="text-xl font-semibold flex justify-center items-center tracking-tight text-zinc-900"
+          >
             <Image
               src={"/favicon.ico"}
               height="104"
@@ -69,7 +83,9 @@ export default function LoginPage() {
               alt="MTWO Groups Logo"
             />
           </Link>
-          <h1 className="mt-4 text-2xl font-semibold text-zinc-900">Sign in to your account</h1>
+          <h1 className="mt-4 text-2xl font-semibold text-zinc-900">
+            Sign in to your account
+          </h1>
           <p className="mt-2 text-sm text-zinc-600">
             Access your procurement dashboard and vendor connections.
           </p>
@@ -78,7 +94,10 @@ export default function LoginPage() {
         <section className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm sm:p-7">
           <form onSubmit={handleSubmit} className="space-y-5" noValidate>
             <div>
-              <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-zinc-800">
+              <label
+                htmlFor="email"
+                className="mb-1.5 block text-sm font-medium text-zinc-800"
+              >
                 Email address
               </label>
               <input
@@ -94,10 +113,16 @@ export default function LoginPage() {
 
             <div>
               <div className="mb-1.5 flex items-center justify-between">
-                <label htmlFor="password" className="block text-sm font-medium text-zinc-800">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-zinc-800"
+                >
                   Password
                 </label>
-                <Link href="#" className="text-xs font-medium text-[#1d4ed8] hover:text-[#1e40af]">
+                <Link
+                  href="#"
+                  className="text-xs font-medium text-[#1d4ed8] hover:text-[#1e40af]"
+                >
                   Forgot password?
                 </Link>
               </div>
@@ -124,7 +149,11 @@ export default function LoginPage() {
                 </button>
               </div>
               <div className="mt-2 space-y-1 text-xs">
-                <p className={hasMinLength ? "text-emerald-600" : "text-zinc-500"}>
+                <p
+                  className={
+                    hasMinLength ? "text-emerald-600" : "text-zinc-500"
+                  }
+                >
                   At least 7 characters
                 </p>
                 <p className={hasNumber ? "text-emerald-600" : "text-zinc-500"}>
@@ -144,7 +173,10 @@ export default function LoginPage() {
 
           <p className="mt-6 text-center text-sm text-zinc-600">
             New to MTWO Groups?{" "}
-            <Link href="/register" className="font-medium text-[#1d4ed8] hover:text-[#1e40af]">
+            <Link
+              href="/register"
+              className="font-medium text-[#1d4ed8] hover:text-[#1e40af]"
+            >
               Create an account
             </Link>
           </p>

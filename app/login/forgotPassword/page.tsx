@@ -45,7 +45,10 @@ export default function ForgotPasswordPage() {
         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/otp/send`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "x-request-from": "client",
+          },
           body: JSON.stringify({ email }),
         },
       );
@@ -82,7 +85,10 @@ export default function ForgotPasswordPage() {
         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/otp/verify`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "x-request-from": "client",
+          },
           body: JSON.stringify({ email, otp }),
         },
       );
@@ -122,7 +128,10 @@ export default function ForgotPasswordPage() {
         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/reset-password`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "x-request-from": "client",
+          },
           credentials: "include",
           body: JSON.stringify({ email, password }),
         },
@@ -141,6 +150,9 @@ export default function ForgotPasswordPage() {
         await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`, {
           method: "POST",
           credentials: "include",
+          headers: {
+            "x-request-from": "client",
+          },
         });
       } catch {
         // Ignore logout errors, proceed anyway
@@ -168,18 +180,14 @@ export default function ForgotPasswordPage() {
             href="/"
             className="flex items-center justify-center text-xl font-semibold tracking-tight text-zinc-900"
           >
-            <Image
-              src={"/favicon.ico"}
-              height="104"
-              width="100"
-              alt=" Logo"
-            />
+            <Image src={"/favicon.ico"} height="104" width="100" alt=" Logo" />
           </Link>
           <h1 className="mt-4 text-2xl font-semibold text-zinc-900">
             Reset your password
           </h1>
           <p className="mt-2 text-sm text-zinc-600">
-            {step === "email" && "Enter your email to receive a verification code"}
+            {step === "email" &&
+              "Enter your email to receive a verification code"}
             {step === "otp" && "Enter the verification code sent to your email"}
             {step === "reset" && "Create a new strong password"}
             {step === "success" && "Your password has been reset successfully"}
@@ -208,7 +216,11 @@ export default function ForgotPasswordPage() {
               </div>
               <button
                 onClick={handleSendOTP}
-                disabled={!email || isLoading || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)}
+                disabled={
+                  !email ||
+                  isLoading ||
+                  !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+                }
                 className="h-11 w-full rounded-md bg-[#1d4ed8] px-4 text-sm font-medium text-white transition-colors hover:bg-[#1e40af] disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {isLoading ? "Sending..." : "Send verification code"}
@@ -296,19 +308,37 @@ export default function ForgotPasswordPage() {
                   </button>
                 </div>
                 <div className="mt-2 space-y-1 text-xs">
-                  <p className={hasMinLength ? "text-emerald-600" : "text-zinc-500"}>
+                  <p
+                    className={
+                      hasMinLength ? "text-emerald-600" : "text-zinc-500"
+                    }
+                  >
                     At least 7 characters
                   </p>
-                  <p className={hasUppercase ? "text-emerald-600" : "text-zinc-500"}>
+                  <p
+                    className={
+                      hasUppercase ? "text-emerald-600" : "text-zinc-500"
+                    }
+                  >
                     Contains an uppercase letter
                   </p>
-                  <p className={hasLowercase ? "text-emerald-600" : "text-zinc-500"}>
+                  <p
+                    className={
+                      hasLowercase ? "text-emerald-600" : "text-zinc-500"
+                    }
+                  >
                     Contains a lowercase letter
                   </p>
-                  <p className={hasNumber ? "text-emerald-600" : "text-zinc-500"}>
+                  <p
+                    className={hasNumber ? "text-emerald-600" : "text-zinc-500"}
+                  >
                     Contains at least 1 number
                   </p>
-                  <p className={hasSpecialChar ? "text-emerald-600" : "text-zinc-500"}>
+                  <p
+                    className={
+                      hasSpecialChar ? "text-emerald-600" : "text-zinc-500"
+                    }
+                  >
                     Contains at least 1 special character
                   </p>
                 </div>
@@ -336,7 +366,11 @@ export default function ForgotPasswordPage() {
                     onClick={() => setShowConfirmPassword((prev) => !prev)}
                     className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-zinc-500 hover:text-zinc-700"
                   >
-                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    {showConfirmPassword ? (
+                      <EyeOff size={18} />
+                    ) : (
+                      <Eye size={18} />
+                    )}
                   </button>
                 </div>
                 {confirmPassword && !passwordsMatch && (
@@ -378,7 +412,8 @@ export default function ForgotPasswordPage() {
                 Password Reset Successful
               </h3>
               <p className="text-sm text-zinc-600">
-                Your password has been reset. Please log in with your new password.
+                Your password has been reset. Please log in with your new
+                password.
               </p>
               <Link
                 href="/login"

@@ -35,7 +35,12 @@ export default function SetupProfile() {
         `${process.env.NEXT_PUBLIC_API_URL}/api/client/checkSetupStatus`,
         {
           credentials: "include",
-        }
+
+          headers: {
+            "Content-Type": "application/json",
+            "x-request-from": "client",
+          },
+        },
       );
 
       if (res.ok) {
@@ -80,7 +85,7 @@ export default function SetupProfile() {
         enableHighAccuracy: true,
         timeout: 10000,
         maximumAge: 0,
-      }
+      },
     );
   };
 
@@ -114,7 +119,10 @@ export default function SetupProfile() {
         `${process.env.NEXT_PUBLIC_API_URL}/api/client/addClientDetails`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "x-request-from": "client",
+          },
           credentials: "include",
           body: JSON.stringify({
             phone,
@@ -126,7 +134,7 @@ export default function SetupProfile() {
             latitude,
             longitude,
           }),
-        }
+        },
       );
 
       const data = await res.json();
@@ -160,7 +168,8 @@ export default function SetupProfile() {
               Profile Already Set Up
             </h1>
             <p className="text-sm text-zinc-600 mb-6">
-              You have already completed your profile setup. You can edit your details from the profile page.
+              You have already completed your profile setup. You can edit your
+              details from the profile page.
             </p>
             <button
               onClick={() => router.push("/profile")}
@@ -315,7 +324,9 @@ export default function SetupProfile() {
                         required
                         maxLength={6}
                         value={pincode}
-                        onChange={(e) => setPincode(e.target.value.replace(/\D/g, ""))}
+                        onChange={(e) =>
+                          setPincode(e.target.value.replace(/\D/g, ""))
+                        }
                         placeholder="400001"
                         className="h-11 w-full rounded-md border border-zinc-300 px-3 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-blue-600 focus:ring-1 focus:ring-blue-600/30"
                       />

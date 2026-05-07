@@ -47,6 +47,11 @@ export const useCartStore = create<CartState>((set, get) => ({
     try {
       const res = await fetch(`${API_BASE}/api/cart`, {
         credentials: "include",
+
+        headers: {
+          "Content-Type": "application/json",
+          "x-request-from": "client",
+        },
       });
       if (!res.ok) {
         if (res.status === 401) {
@@ -78,7 +83,10 @@ export const useCartStore = create<CartState>((set, get) => ({
     try {
       const res = await fetch(`${API_BASE}/api/cart`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-request-from": "client",
+        },
         credentials: "include",
         body: JSON.stringify({
           product_id: item.productId,
@@ -104,7 +112,10 @@ export const useCartStore = create<CartState>((set, get) => ({
     try {
       const res = await fetch(`${API_BASE}/api/cart/item`, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-request-from": "client",
+        },
         credentials: "include",
         body: JSON.stringify({ product_id: productId, vendor_id: vendorId }),
       });
@@ -123,7 +134,10 @@ export const useCartStore = create<CartState>((set, get) => ({
     try {
       const res = await fetch(`${API_BASE}/api/cart/item`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-request-from": "client",
+        },
         credentials: "include",
         body: JSON.stringify({ product_id: productId, vendor_id: vendorId, quantity }),
       });
@@ -142,6 +156,10 @@ export const useCartStore = create<CartState>((set, get) => ({
       const res = await fetch(`${API_BASE}/api/cart`, {
         method: "DELETE",
         credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          "x-request-from": "client",
+        },
       });
       if (!res.ok) throw new Error("Failed to clear cart");
       set({ items: [], isLoading: false });

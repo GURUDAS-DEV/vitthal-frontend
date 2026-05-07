@@ -33,6 +33,10 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const res = await fetch(`${API_URL}/api/auth/me`, {
         credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          "x-request-from": "client",
+        },
       });
       if (res.ok) {
         const data = await res.json();
@@ -50,6 +54,10 @@ export const useAuthStore = create<AuthState>((set) => ({
       await fetch(`${API_URL}/api/auth/logout`, {
         method: "POST",
         credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          "x-request-from": "client",
+        },
       });
     } catch {
       // ignore

@@ -63,7 +63,10 @@ export default function RegisterPage() {
         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "x-request-from": "client",
+          },
           credentials: "include",
           body: JSON.stringify({
             name,
@@ -102,7 +105,11 @@ export default function RegisterPage() {
         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+
+          headers: {
+            "Content-Type": "application/json",
+            "x-request-from": "client",
+          },
           credentials: "include",
           body: JSON.stringify({
             name: registeredName,
@@ -144,7 +151,10 @@ export default function RegisterPage() {
         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/verify-registration`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "x-request-from": "client",
+          },
           credentials: "include",
           body: JSON.stringify({ email: registeredEmail, otp }),
         },
@@ -258,25 +268,45 @@ export default function RegisterPage() {
                     type="button"
                     onClick={() => setShowPassword((prev) => !prev)}
                     className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-zinc-500 hover:text-zinc-700"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
                 <div className="mt-2 space-y-1 text-xs">
-                  <p className={hasMinLength ? "text-emerald-600" : "text-zinc-500"}>
+                  <p
+                    className={
+                      hasMinLength ? "text-emerald-600" : "text-zinc-500"
+                    }
+                  >
                     At least 7 characters
                   </p>
-                  <p className={hasUppercase ? "text-emerald-600" : "text-zinc-500"}>
+                  <p
+                    className={
+                      hasUppercase ? "text-emerald-600" : "text-zinc-500"
+                    }
+                  >
                     Contains an uppercase letter
                   </p>
-                  <p className={hasLowercase ? "text-emerald-600" : "text-zinc-500"}>
+                  <p
+                    className={
+                      hasLowercase ? "text-emerald-600" : "text-zinc-500"
+                    }
+                  >
                     Contains a lowercase letter
                   </p>
-                  <p className={hasNumber ? "text-emerald-600" : "text-zinc-500"}>
+                  <p
+                    className={hasNumber ? "text-emerald-600" : "text-zinc-500"}
+                  >
                     Contains at least 1 number
                   </p>
-                  <p className={hasSpecialChar ? "text-emerald-600" : "text-zinc-500"}>
+                  <p
+                    className={
+                      hasSpecialChar ? "text-emerald-600" : "text-zinc-500"
+                    }
+                  >
                     Contains at least 1 special character
                   </p>
                 </div>
@@ -307,13 +337,23 @@ export default function RegisterPage() {
                     type="button"
                     onClick={() => setShowConfirmPassword((prev) => !prev)}
                     className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-zinc-500 hover:text-zinc-700"
-                    aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                    aria-label={
+                      showConfirmPassword
+                        ? "Hide confirm password"
+                        : "Show confirm password"
+                    }
                   >
-                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    {showConfirmPassword ? (
+                      <EyeOff size={18} />
+                    ) : (
+                      <Eye size={18} />
+                    )}
                   </button>
                 </div>
                 {!passwordsMatch ? (
-                  <p className="mt-1.5 text-xs text-red-600">Passwords do not match.</p>
+                  <p className="mt-1.5 text-xs text-red-600">
+                    Passwords do not match.
+                  </p>
                 ) : null}
               </div>
 
@@ -344,7 +384,9 @@ export default function RegisterPage() {
                     placeholder="000000"
                     value={otp}
                     onChange={(e) => {
-                      const value = e.target.value.replace(/\D/g, "").slice(0, 6);
+                      const value = e.target.value
+                        .replace(/\D/g, "")
+                        .slice(0, 6);
                       setOtp(value);
                     }}
                     className="h-11 flex-1 rounded-md border border-zinc-300 px-3 text-center text-lg font-medium tracking-widest text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-[#1d4ed8] focus:ring-1 focus:ring-[#1d4ed8]/30"
@@ -371,7 +413,10 @@ export default function RegisterPage() {
 
           <p className="mt-6 text-center text-sm text-zinc-600">
             Already have an account?{" "}
-            <Link href="/login" className="font-medium text-[#1d4ed8] hover:text-[#1e40af]">
+            <Link
+              href="/login"
+              className="font-medium text-[#1d4ed8] hover:text-[#1e40af]"
+            >
               Sign in
             </Link>
           </p>

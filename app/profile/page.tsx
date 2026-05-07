@@ -56,7 +56,9 @@ export default function ProfilePage() {
   const [profileImage, setProfileImage] = useState<string | null>(null);
 
   // Client details from backend
-  const [clientDetails, setClientDetails] = useState<ClientDetails | null>(null);
+  const [clientDetails, setClientDetails] = useState<ClientDetails | null>(
+    null,
+  );
   const [isLoading, setIsLoading] = useState(true);
 
   // Setup Prompt State
@@ -83,9 +85,16 @@ export default function ProfilePage() {
   useLayoutEffect(() => {
     async function fetchClientDetails() {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/client/clientDetails`, {
-          credentials: "include",
-        });
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/client/clientDetails`,
+          {
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+              "x-request-from": "client",
+            },
+          },
+        );
 
         if (response.ok) {
           const data = await response.json();
@@ -150,31 +159,47 @@ export default function ProfilePage() {
       let updated = false;
 
       if (editPhone !== clientDetails?.phone) {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/client/updateClientNumber`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ phone: editPhone }),
-        });
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/client/updateClientNumber`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              "x-request-from": "client",
+            },
+            credentials: "include",
+            body: JSON.stringify({ phone: editPhone }),
+          },
+        );
 
         if (!response.ok) throw new Error("Failed to update phone number");
 
-        setClientDetails(prev => prev ? { ...prev, phone: editPhone } : null);
+        setClientDetails((prev) =>
+          prev ? { ...prev, phone: editPhone } : null,
+        );
         updated = true;
       }
 
       if (editName !== user?.username) {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/update-name`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ name: editName }),
-        });
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/auth/update-name`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              "x-request-from": "client",
+            },
+            credentials: "include",
+            body: JSON.stringify({ name: editName }),
+          },
+        );
 
         if (!response.ok) throw new Error("Failed to update name");
 
         await fetchUser();
-        setClientDetails(prev => prev ? { ...prev, user_name: editName } : null);
+        setClientDetails((prev) =>
+          prev ? { ...prev, user_name: editName } : null,
+        );
         updated = true;
       }
 
@@ -196,10 +221,10 @@ export default function ProfilePage() {
     setIsGettingLocation(true);
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        setAddressForm(prev => ({
+        setAddressForm((prev) => ({
           ...prev,
           latitude: position.coords.latitude,
-          longitude: position.coords.longitude
+          longitude: position.coords.longitude,
         }));
         setIsGettingLocation(false);
         toast.success("Location captured successfully!");
@@ -208,13 +233,19 @@ export default function ProfilePage() {
         setIsGettingLocation(false);
         toast.error("Failed to get location. Please enable location services.");
       },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
     );
   };
 
   async function handleUpdateAddress() {
     try {
-      if (!addressForm.address || !addressForm.city || !addressForm.state || !addressForm.country || !addressForm.pincode) {
+      if (
+        !addressForm.address ||
+        !addressForm.city ||
+        !addressForm.state ||
+        !addressForm.country ||
+        !addressForm.pincode
+      ) {
         toast.error("All address fields are required");
         return;
       }
@@ -224,29 +255,37 @@ export default function ProfilePage() {
         return;
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/client/updateClientAddress`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/client/updateClientAddress`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            "x-request-from": "client",
+          },
+          credentials: "include",
+          body: JSON.stringify(addressForm),
         },
-        credentials: "include",
-        body: JSON.stringify(addressForm),
-      });
+      );
 
       if (response.ok) {
         toast.success("Address updated successfully");
         const data = await response.json();
 
-        setClientDetails(prev => prev ? {
-          ...prev,
-          address: data.address.address,
-          city: data.address.city,
-          state: data.address.state,
-          country: data.address.country,
-          pincode: data.address.pincode,
-          latitude: data.address.latitude,
-          longitude: data.address.longitude,
-        } : null);
+        setClientDetails((prev) =>
+          prev
+            ? {
+                ...prev,
+                address: data.address.address,
+                city: data.address.city,
+                state: data.address.state,
+                country: data.address.country,
+                pincode: data.address.pincode,
+                latitude: data.address.latitude,
+                longitude: data.address.longitude,
+              }
+            : null,
+        );
 
         setIsEditingAddress(false);
       } else {
@@ -281,7 +320,9 @@ export default function ProfilePage() {
       <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <nav className="mb-6 text-sm text-zinc-500">
-          <Link href="/" className="hover:text-zinc-800 transition-colors">Home</Link>
+          <Link href="/" className="hover:text-zinc-800 transition-colors">
+            Home
+          </Link>
           <span className="mx-2">/</span>
           <span className="text-zinc-800 font-medium">My Profile</span>
         </nav>
@@ -293,9 +334,12 @@ export default function ProfilePage() {
                 <AlertCircle size={24} />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-zinc-900">Complete Your Profile</h3>
+                <h3 className="text-lg font-semibold text-zinc-900">
+                  Complete Your Profile
+                </h3>
                 <p className="text-sm text-zinc-600 mt-1">
-                  You haven't set up your profile yet. Please set it up to add your phone number and delivery address.
+                  You haven't set up your profile yet. Please set it up to add
+                  your phone number and delivery address.
                 </p>
               </div>
             </div>
@@ -323,11 +367,14 @@ export default function ProfilePage() {
                 <p className="text-xs text-zinc-500">View your order history</p>
               </div>
             </div>
-            <ChevronRight size={20} className="text-zinc-400 group-hover:text-zinc-600" />
+            <ChevronRight
+              size={20}
+              className="text-zinc-400 group-hover:text-zinc-600"
+            />
           </Link>
 
           <Link
-            href="/saved"
+            href="/wishlist"
             className="flex items-center justify-between p-5 rounded-xl border border-zinc-200 bg-white shadow-sm hover:border-zinc-300 hover:shadow-md transition-all group"
           >
             <div className="flex items-center gap-4">
@@ -339,7 +386,10 @@ export default function ProfilePage() {
                 <p className="text-xs text-zinc-500">Your wishlist items</p>
               </div>
             </div>
-            <ChevronRight size={20} className="text-zinc-400 group-hover:text-zinc-600" />
+            <ChevronRight
+              size={20}
+              className="text-zinc-400 group-hover:text-zinc-600"
+            />
           </Link>
         </div>
 
@@ -354,14 +404,23 @@ export default function ProfilePage() {
               <div className="relative group">
                 <div className="flex h-24 w-24 items-center justify-center rounded-full border-4 border-white bg-zinc-100 text-zinc-600 shadow-lg overflow-hidden">
                   {profileImage ? (
-                    <img src={profileImage} alt="Profile" className="h-full w-full object-cover" />
+                    <img
+                      src={profileImage}
+                      alt="Profile"
+                      className="h-full w-full object-cover"
+                    />
                   ) : (
                     <User size={40} />
                   )}
                 </div>
                 <label className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                   <Camera size={20} className="text-white" />
-                  <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
                 </label>
               </div>
 
@@ -379,7 +438,9 @@ export default function ProfilePage() {
                     {user?.username || "Guest User"}
                   </h1>
                 )}
-                <p className="text-sm text-zinc-500 mt-0.5">{user?.email || "—"}</p>
+                <p className="text-sm text-zinc-500 mt-0.5">
+                  {user?.email || "—"}
+                </p>
               </div>
 
               <button
@@ -395,7 +456,9 @@ export default function ProfilePage() {
             {/* Account Information */}
             <div className="mt-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-base font-semibold text-zinc-900">Account Details</h2>
+                <h2 className="text-base font-semibold text-zinc-900">
+                  Account Details
+                </h2>
                 {isEditing && isSetupComplete && (
                   <button
                     onClick={handleCancel}
@@ -410,7 +473,14 @@ export default function ProfilePage() {
               {!isSetupComplete && (
                 <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 mb-4">
                   <p className="text-sm text-amber-800">
-                    Please <Link href="/profile/setup" className="font-semibold underline hover:text-amber-900">set up your profile</Link> first to edit your account details.
+                    Please{" "}
+                    <Link
+                      href="/profile/setup"
+                      className="font-semibold underline hover:text-amber-900"
+                    >
+                      set up your profile
+                    </Link>{" "}
+                    first to edit your account details.
                   </p>
                 </div>
               )}
@@ -431,7 +501,9 @@ export default function ProfilePage() {
                       placeholder="Your Name"
                     />
                   ) : (
-                    <p className="text-sm font-medium text-zinc-900">{user?.username || "—"}</p>
+                    <p className="text-sm font-medium text-zinc-900">
+                      {user?.username || "—"}
+                    </p>
                   )}
                 </div>
 
@@ -441,7 +513,9 @@ export default function ProfilePage() {
                     <Mail size={14} />
                     Email Address
                   </div>
-                  <p className="text-sm font-medium text-zinc-900">{user?.email || "—"}</p>
+                  <p className="text-sm font-medium text-zinc-900">
+                    {user?.email || "—"}
+                  </p>
                 </div>
 
                 {/* Phone */}
@@ -459,7 +533,9 @@ export default function ProfilePage() {
                       placeholder="Add phone number"
                     />
                   ) : (
-                    <p className="text-sm font-medium text-zinc-900">{clientDetails?.phone || "—"}</p>
+                    <p className="text-sm font-medium text-zinc-900">
+                      {clientDetails?.phone || "—"}
+                    </p>
                   )}
                 </div>
               </div>
@@ -468,7 +544,9 @@ export default function ProfilePage() {
             {/* Address Section */}
             <div className="mt-6 pt-6 border-t border-zinc-200">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-base font-semibold text-zinc-900">Delivery Address</h2>
+                <h2 className="text-base font-semibold text-zinc-900">
+                  Delivery Address
+                </h2>
                 {isSetupComplete && !isEditingAddress && (
                   <button
                     onClick={() => setIsEditingAddress(true)}
@@ -484,7 +562,9 @@ export default function ProfilePage() {
               {isEditingAddress && isSetupComplete ? (
                 <div className="rounded-lg border border-zinc-200 bg-zinc-50/50 p-4 space-y-4 mb-4">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium text-zinc-900">Update Address</h3>
+                    <h3 className="font-medium text-zinc-900">
+                      Update Address
+                    </h3>
                     <button
                       onClick={() => setIsEditingAddress(false)}
                       className="p-1 rounded hover:bg-zinc-200 text-zinc-500"
@@ -493,32 +573,53 @@ export default function ProfilePage() {
                     </button>
                   </div>
                   <div>
-                    <label className="text-xs text-zinc-500 mb-1 block">Street Address</label>
+                    <label className="text-xs text-zinc-500 mb-1 block">
+                      Street Address
+                    </label>
                     <input
                       type="text"
                       value={addressForm.address}
-                      onChange={(e) => setAddressForm({ ...addressForm, address: e.target.value })}
+                      onChange={(e) =>
+                        setAddressForm({
+                          ...addressForm,
+                          address: e.target.value,
+                        })
+                      }
                       className="w-full px-3 py-2 rounded-lg border border-zinc-300 text-sm focus:outline-none focus:border-[#1d4ed8]"
                       placeholder="Enter street address"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs text-zinc-500 mb-1 block">City</label>
+                      <label className="text-xs text-zinc-500 mb-1 block">
+                        City
+                      </label>
                       <input
                         type="text"
                         value={addressForm.city}
-                        onChange={(e) => setAddressForm({ ...addressForm, city: e.target.value })}
+                        onChange={(e) =>
+                          setAddressForm({
+                            ...addressForm,
+                            city: e.target.value,
+                          })
+                        }
                         className="w-full px-3 py-2 rounded-lg border border-zinc-300 text-sm focus:outline-none focus:border-[#1d4ed8]"
                         placeholder="City"
                       />
                     </div>
                     <div>
-                      <label className="text-xs text-zinc-500 mb-1 block">State</label>
+                      <label className="text-xs text-zinc-500 mb-1 block">
+                        State
+                      </label>
                       <input
                         type="text"
                         value={addressForm.state}
-                        onChange={(e) => setAddressForm({ ...addressForm, state: e.target.value })}
+                        onChange={(e) =>
+                          setAddressForm({
+                            ...addressForm,
+                            state: e.target.value,
+                          })
+                        }
                         className="w-full px-3 py-2 rounded-lg border border-zinc-300 text-sm focus:outline-none focus:border-[#1d4ed8]"
                         placeholder="State"
                       />
@@ -526,21 +627,35 @@ export default function ProfilePage() {
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs text-zinc-500 mb-1 block">Country</label>
+                      <label className="text-xs text-zinc-500 mb-1 block">
+                        Country
+                      </label>
                       <input
                         type="text"
                         value={addressForm.country}
-                        onChange={(e) => setAddressForm({ ...addressForm, country: e.target.value })}
+                        onChange={(e) =>
+                          setAddressForm({
+                            ...addressForm,
+                            country: e.target.value,
+                          })
+                        }
                         className="w-full px-3 py-2 rounded-lg border border-zinc-300 text-sm focus:outline-none focus:border-[#1d4ed8]"
                         placeholder="Country"
                       />
                     </div>
                     <div>
-                      <label className="text-xs text-zinc-500 mb-1 block">Pincode</label>
+                      <label className="text-xs text-zinc-500 mb-1 block">
+                        Pincode
+                      </label>
                       <input
                         type="text"
                         value={addressForm.pincode}
-                        onChange={(e) => setAddressForm({ ...addressForm, pincode: e.target.value })}
+                        onChange={(e) =>
+                          setAddressForm({
+                            ...addressForm,
+                            pincode: e.target.value,
+                          })
+                        }
                         className="w-full px-3 py-2 rounded-lg border border-zinc-300 text-sm focus:outline-none focus:border-[#1d4ed8]"
                         placeholder="Pincode"
                       />
@@ -548,7 +663,9 @@ export default function ProfilePage() {
                   </div>
 
                   <div>
-                    <label className="text-xs text-zinc-500 mb-1 block">Location Coordinates</label>
+                    <label className="text-xs text-zinc-500 mb-1 block">
+                      Location Coordinates
+                    </label>
                     <div className="flex gap-2">
                       <button
                         type="button"
@@ -556,13 +673,20 @@ export default function ProfilePage() {
                         disabled={isGettingLocation}
                         className="flex-1 flex items-center justify-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
                       >
-                        {isGettingLocation ? <Loader2 size={16} className="animate-spin" /> : <MapPin size={16} />}
-                        {addressForm.latitude ? "Update Location" : "Capture Location"}
+                        {isGettingLocation ? (
+                          <Loader2 size={16} className="animate-spin" />
+                        ) : (
+                          <MapPin size={16} />
+                        )}
+                        {addressForm.latitude
+                          ? "Update Location"
+                          : "Capture Location"}
                       </button>
                     </div>
                     {addressForm.latitude && addressForm.longitude && (
                       <p className="mt-2 text-xs text-green-600 font-medium">
-                        Coordinates: {addressForm.latitude.toFixed(6)}, {addressForm.longitude.toFixed(6)}
+                        Coordinates: {addressForm.latitude.toFixed(6)},{" "}
+                        {addressForm.longitude.toFixed(6)}
                       </p>
                     )}
                   </div>
@@ -589,11 +713,16 @@ export default function ProfilePage() {
                       <MapPin size={18} />
                     </div>
                     <div>
-                      <p className="font-medium text-zinc-900">{clientDetails.address}</p>
-                      <p className="text-sm text-zinc-600 mt-0.5">
-                        {clientDetails.city}, {clientDetails.state} - {clientDetails.pincode}
+                      <p className="font-medium text-zinc-900">
+                        {clientDetails.address}
                       </p>
-                      <p className="text-sm text-zinc-500">{clientDetails.country}</p>
+                      <p className="text-sm text-zinc-600 mt-0.5">
+                        {clientDetails.city}, {clientDetails.state} -{" "}
+                        {clientDetails.pincode}
+                      </p>
+                      <p className="text-sm text-zinc-500">
+                        {clientDetails.country}
+                      </p>
                       {clientDetails.latitude && clientDetails.longitude && (
                         <p className="text-xs text-zinc-400 mt-1">
                           📍 {clientDetails.latitude}, {clientDetails.longitude}

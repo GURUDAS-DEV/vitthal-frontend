@@ -1,19 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { Minus, Plus, Trash2, ShoppingCart, ArrowLeft, Package, Loader2 } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingCart, ArrowLeft, Package, Loader2, Heart } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import { useAuthStore } from "@/store/authStore";
+import { useWishlistStore } from "@/store/wishlistStore";
 import { useEffect, useLayoutEffect, useRef, useCallback, useState } from "react";
 import { toast } from "sonner";
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, clearCart, totalPrice, fetchCart, isLoading } = useCartStore();
   const { fetchUser, user } = useAuthStore();
+  const { addItem: addToWishlist } = useWishlistStore();
 
   // Local optimistic quantities for instant UI response
   const [localQty, setLocalQty] = useState<Record<string, number>>({});
   const debounceTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  const [movingToWishlistKey, setMovingToWishlistKey] = useState<string | null>(null);
 
   useLayoutEffect(() => {
     fetchUser();
@@ -86,6 +89,36 @@ export default function CartPage() {
     const success = await clearCart();
     if (success) toast.success("Cart cleared");
     else toast.error("Failed to clear cart");
+  };
+
+  const handleMoveToWishlist = async (productId: string, vendorId: string, itemName: string, image: string, price: number, moq: number, vendorName: string) => {
+    const key = `${productId}-${vendorId}`;
+    setMovingToWishlistKey(key);
+
+    const saved = await addToWishlist({
+      productId,
+      productName: itemName,
+      description: "",
+      image,
+      vendorId,
+      vendorName,
+      price,
+      moq,
+      stockQuantity: 0,
+    });
+
+    if (saved) {
+      const removed = await removeItem(productId, vendorId);
+      if (removed) {
+        toast.success("Moved to wishlist");
+      } else {
+        toast.warning("Saved to wishlist, but could not remove from cart");
+      }
+    } else {
+      toast.error("Failed to move item to wishlist");
+    }
+
+    setMovingToWishlistKey(null);
   };
 
   if (isLoading) {
@@ -229,14 +262,28 @@ export default function CartPage() {
                         <Link href={`/product/${item.productId}`} className="text-sm font-semibold text-zinc-900 truncate hover:text-[#1d4ed8] transition-colors">{item.productName}</Link>
                         <p className="text-xs text-zinc-500 mt-0.5">Supplier: {item.vendorName}</p>
                       </div>
-                      <button
-                        onClick={() => handleRemove(item.productId, item.vendorId)}
-                        disabled={isLoading}
-                        className="flex-shrink-0 rounded p-1.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
-                        aria-label="Remove item"
-                      >
-                        <Trash2 size={16} />
-                      </button>
+                      <div className="flex flex-col items-end gap-2">
+                        <button
+                          onClick={() => handleRemove(item.productId, item.vendorId)}
+                          disabled={isLoading}
+                          className="flex-shrink-0 rounded p-1.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
+                          aria-label="Remove item"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleMoveToWishlist(item.productId, item.vendorId, item.productName, item.image, item.price, item.moq, item.vendorName)}
+                          disabled={isLoading || movingToWishlistKey === `${item.productId}-${item.vendorId}`}
+                          className="inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-semibold text-rose-600 transition-colors hover:bg-rose-50 hover:text-rose-700 disabled:opacity-50"
+                        >
+                          {movingToWishlistKey === `${item.productId}-${item.vendorId}` ? (
+                            <Loader2 size={12} className="animate-spin" />
+                          ) : (
+                            <Heart size={12} />
+                          )}
+                          Save for later
+                        </button>
+                      </div>
                     </div>
 
                     <div className="mt-3 flex flex-wrap items-center gap-4">
